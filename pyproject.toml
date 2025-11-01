@@ -1,0 +1,31 @@
+[project]
+name = "fastapi-app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.120.4",
+    "bcrypt>=5.0.0",
+    "pydantic-ai>=1.9.1",
+    "pydantic-settings>=2.11.0",
+    "sqlalchemy>=2.0.44",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "httpx>=0.28.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
