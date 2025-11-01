@@ -13,7 +13,7 @@ A production-ready FastAPI application with feature-based architecture, comprehe
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd fastapi-app
+cd octopus
 
 # Install dependencies
 uv sync
@@ -160,7 +160,7 @@ uv run pytest --cov=app --cov-report=html
 ## 📦 Project Structure
 
 ```
-fastapi-app/
+octopus/
 ├── app/
 │   ├── api/v1/           # API routing
 │   ├── core/             # Config and security
@@ -180,10 +180,10 @@ fastapi-app/
 
 ```bash
 # Build the Docker image
-docker build -t fastapi-app .
+docker build -t octopus .
 
 # Run the container
-docker run -p 8000:80 fastapi-app
+docker run -p 8000:80 octopus
 ```
 
 ## 🤝 Contributing

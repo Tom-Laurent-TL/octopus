@@ -9,7 +9,7 @@ This application follows a **feature-based architecture** with clear layer separ
 ## Directory Structure
 
 ```
-fastapi-app/
+octopus/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py                    # Application entry point

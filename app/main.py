@@ -13,7 +13,7 @@ def create_app() -> FastAPI:
     
     # Create FastAPI app
     app = FastAPI(
-        title="FastAPI App",
+        title="Octopus Chat",
         description="A FastAPI application with chat conversations",
         version="0.1.0",
     )
