@@ -1,4 +1,4 @@
-# FastAPI App
+# Octopus
 
 A production-ready FastAPI application with feature-based architecture, comprehensive testing, and clean separation of concerns.
 
