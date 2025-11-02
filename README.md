@@ -12,7 +12,7 @@ A production-ready FastAPI application with feature-based architecture, comprehe
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/Tom-Laurent-TL/octopus.git
 cd octopus
 
 # Install dependencies
