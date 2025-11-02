@@ -12,3 +12,6 @@ wheels/
 
 # Environment files
 .env
+
+# SQLite database files
+*.db
