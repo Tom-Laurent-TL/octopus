@@ -16,5 +16,9 @@ VOLUME ["/app/data"]
 # Set environment variable to use the volume for database
 ENV DATABASE_URL=sqlite:////app/data/chat_conversations.db
 
-# Run the application.
-CMD ["/app/.venv/bin/fastapi", "run", "app/main.py", "--port", "80"]
+# Copy and set up entrypoint script for migrations
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
+# Run the application with migrations
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

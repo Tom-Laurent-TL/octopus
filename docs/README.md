@@ -63,11 +63,28 @@ Welcome to the Octopus API documentation! This folder contains comprehensive gui
    - Troubleshooting guide
    - **Essential for containerized deployments**
 
+8. **[Database Migrations](DATABASE_MIGRATIONS.md)** 🗄️
+   - Complete Alembic migration guide
+   - Creating and applying migrations
+   - Team workflow and best practices
+   - SQLite limitations and solutions
+   - Docker integration
+   - **Read this before making schema changes**
+
+### For Operations
+
+9. **[Environment Configuration](ENVIRONMENT_CONFIG.md)** ⚙️
+   - Environment variable configuration
+   - Local vs Docker setup
+   - Configuration precedence
+   - Troubleshooting configuration issues
+
 ## 🎯 Quick Navigation
 
 ### I want to...
 
 - **Build a new feature** → [Feature Implementation Guide](FEATURE_IMPLEMENTATION_GUIDE.md)
+- **Change database schema** → [Database Migrations](DATABASE_MIGRATIONS.md)
 - **Understand the codebase** → [Project Architecture](PROJECT_STRUCTURE.md)
 - **Avoid common mistakes** → [Best Practices](BEST_PRACTICES.md)
 - **Write tests** → See testing sections in [Feature Implementation Guide](FEATURE_IMPLEMENTATION_GUIDE.md)

@@ -98,11 +98,12 @@ def run_migrations(db: Session):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         api_key_id INTEGER,
         action VARCHAR(50) NOT NULL,
-        performed_by VARCHAR(255),
-        ip_address VARCHAR(45),
+        performed_by_key_id INTEGER,
+        performed_by_ip VARCHAR(45),
         details TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(api_key_id) REFERENCES api_keys (id)
+        FOREIGN KEY(api_key_id) REFERENCES api_keys (id),
+        FOREIGN KEY(performed_by_key_id) REFERENCES api_keys (id)
     )
     """
     
@@ -117,5 +118,22 @@ def run_migrations(db: Session):
             logger.error(f"Failed to create api_key_audit_logs table: {e}")
             db.rollback()
             raise
+    
+    # Migration 4: Add performed_by_key_id to existing api_key_audit_logs table
+    check_and_add_column(
+        db,
+        "api_key_audit_logs",
+        "performed_by_key_id",
+        "INTEGER"
+    )
+    
+    # Migration 5: Add performed_by_ip to existing api_key_audit_logs table
+    # (old tables might have ip_address instead)
+    check_and_add_column(
+        db,
+        "api_key_audit_logs",
+        "performed_by_ip",
+        "VARCHAR(45)"
+    )
     
     logger.info("Database schema check complete")

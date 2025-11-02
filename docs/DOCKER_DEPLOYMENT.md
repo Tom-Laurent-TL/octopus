@@ -102,12 +102,26 @@ The database is stored in the `./data` directory on your host machine:
 
 ### Database Migrations
 
-The application automatically runs migrations on startup to add missing columns to existing tables. This ensures your database schema is always up to date.
+This project uses **Alembic** for database schema migrations. Migrations are automatically applied when the container starts.
 
-**Automatic migrations include:**
-- Adding `last_used_ip` column to `api_keys` table
-- Adding `allowed_ips` column to `api_keys` table
-- Creating `api_key_audit_logs` table if missing
+**How it works:**
+- The Docker entrypoint script runs `alembic upgrade head` on startup
+- This applies any pending database migrations
+- Safe to run multiple times - only applies new migrations
+
+**To manually run migrations:**
+```bash
+# Inside the container
+docker-compose exec app alembic upgrade head
+
+# Check current migration version
+docker-compose exec app alembic current
+
+# View migration history
+docker-compose exec app alembic history
+```
+
+**For more details**, see the comprehensive [Database Migrations Guide](DATABASE_MIGRATIONS.md).
 
 ### Reset Database
 
@@ -122,7 +136,7 @@ rm -rf ./data/chat_conversations.db
 # or on Windows PowerShell:
 Remove-Item -Path .\data\chat_conversations.db -Force
 
-# Start the container (creates new database)
+# Start the container (creates new database and applies migrations)
 docker-compose up -d
 
 # Bootstrap again (create new master key)
@@ -437,6 +451,29 @@ mkdir -p ./data
 # Verify Dockerfile builds correctly
 docker build -t octopus .
 ```
+
+### "alembic: command not found" Error
+
+**Error**: Container exits with `alembic: command not found` or `fastapi: command not found`.
+
+**Cause**: When using `uv` package manager, executables are installed in the virtual environment at `/app/.venv/bin/`, which may not be in the container's PATH.
+
+**Solution**: The `docker-entrypoint.sh` script should use full paths to executables:
+
+```bash
+#!/bin/bash
+set -e
+
+# Use full path to alembic
+/app/.venv/bin/alembic upgrade head
+
+# Use full path to fastapi
+exec /app/.venv/bin/fastapi run app/main.py --host 0.0.0.0 --port 80
+```
+
+This issue has been fixed in the current codebase. If you encounter it:
+1. Update your `docker-entrypoint.sh` with the full paths above
+2. Rebuild: `docker-compose down && docker-compose up --build`
 
 ## Health Checks
 

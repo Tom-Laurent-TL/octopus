@@ -26,10 +26,10 @@ Create a `.env` file in the project root:
 
 ```env
 MASTER_API_KEY=your-secret-api-key-here
-DATABASE_URL=sqlite:///./chat_conversations.db
+DATABASE_URL=sqlite:///./data/chat_conversations.db
 ```
 
-**Note for Docker users**: Keep this configuration! Docker Compose automatically overrides `DATABASE_URL` with the correct Docker path. See [Docker Deployment Guide](docs/DOCKER_DEPLOYMENT.md) for details.
+**Note**: Database is stored in the `data/` folder for clean organization and consistency with Docker setup. See [Docker Deployment Guide](docs/DOCKER_DEPLOYMENT.md) for details.
 
 ### Run the Application
 
@@ -202,6 +202,32 @@ curl -X POST "http://localhost:8000/api/v1/api-keys/2/deactivate" \
 
 See [API Key Security Documentation](docs/API_KEY_SECURITY.md) for detailed security features.
 
+## 🗄️ Database Migrations
+
+This project uses **[Alembic](https://alembic.sqlalchemy.org/)** for database schema migrations.
+
+```bash
+# Apply all pending migrations
+uv run alembic upgrade head
+
+# Check current migration version
+uv run alembic current
+
+# Create a new migration after model changes
+uv run alembic revision --autogenerate -m "description"
+
+# Rollback one migration
+uv run alembic downgrade -1
+```
+
+**First time setup** (if you already have a database):
+```bash
+# Mark existing database as at current baseline
+uv run alembic stamp head
+```
+
+For comprehensive migration guides, see [Database Migrations Documentation](docs/DATABASE_MIGRATIONS.md).
+
 ## 🧪 Testing
 
 - **77 tests** covering all features (all passing)
@@ -373,7 +399,7 @@ DATABASE_URL=sqlite:///./chat_conversations.db
 
 | Environment | Database Path | Configured By |
 |-------------|---------------|---------------|
-| Local (`uv run`) | `./chat_conversations.db` | `.env` file |
+| Local (`uv run`) | `./data/chat_conversations.db` | `.env` file |
 | Docker Compose | `./data/chat_conversations.db` | `docker-compose.yml` |
 
 ### Troubleshooting

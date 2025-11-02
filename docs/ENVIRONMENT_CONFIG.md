@@ -6,7 +6,7 @@ This guide explains how to configure environment variables for local development
 
 | Scenario | Database Path | Config File |
 |----------|---------------|-------------|
-| **Local Development** | `sqlite:///./chat_conversations.db` | `.env` |
+| **Local Development** | `sqlite:///./data/chat_conversations.db` | `.env` |
 | **Docker/Docker Compose** | `sqlite:////app/data/chat_conversations.db` | `docker-compose.yml` (auto-override) |
 
 ## Setup
@@ -20,7 +20,7 @@ cp .env.example .env
 # Or create manually
 cat > .env << 'EOF'
 MASTER_API_KEY=your-secret-api-key-here
-DATABASE_URL=sqlite:///./chat_conversations.db
+DATABASE_URL=sqlite:///./data/chat_conversations.db
 EOF
 ```
 
@@ -73,14 +73,15 @@ docker-compose restart
 #### DATABASE_URL
 - **Purpose**: Specifies database location
 - **Format**: SQLAlchemy database URL
-- **Local**: `sqlite:///./chat_conversations.db` (relative path, 3 slashes)
+- **Local**: `sqlite:///./data/chat_conversations.db` (relative path, 3 slashes)
 - **Docker**: `sqlite:////app/data/chat_conversations.db` (absolute path, 4 slashes)
+- **Note**: Database is stored in `data/` folder for clean organization
 
 ### SQLite URL Format
 
 ```
-sqlite:///path         = Relative path (3 slashes total)
-sqlite:////path        = Absolute path (4 slashes total)
+sqlite:///./data/file.db    = Relative path (3 slashes, ./data/ folder)
+sqlite:////absolute/path    = Absolute path (4 slashes total)
 ```
 
 Examples:
@@ -196,11 +197,11 @@ cp .env.example .env
 
 ### Issue: "Different database in local vs Docker"
 
-**This is normal!** They use separate databases:
-- **Local**: `./chat_conversations.db`
-- **Docker**: `./data/chat_conversations.db`
+**Both now use the same location!** `data/chat_conversations.db`
+- **Local**: `./data/chat_conversations.db` (via `.env`)
+- **Docker**: `./data/chat_conversations.db` (volume mounted)
 
-This is intentional - keeps your environments separate.
+This provides consistency between local and Docker environments.
 
 ## Switching Between Environments
 
@@ -211,19 +212,10 @@ This is intentional - keeps your environments separate.
 
 # Start Docker
 docker-compose up -d
-
-# Bootstrap if needed
-curl -X POST http://localhost:8000/bootstrap
 ```
 
-**Note**: Different database! You'll need to bootstrap again or copy the database:
-
-```bash
-# Copy local database to Docker
-mkdir -p data
-cp chat_conversations.db data/
-docker-compose restart
-```
+**Note**: Since both use `data/chat_conversations.db`, your data is already shared!
+No need to bootstrap again - your existing data will work in Docker.
 
 ### From Docker to Local
 

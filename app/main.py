@@ -4,8 +4,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import logging
 
-from app.db.database import engine, Base, SessionLocal
-from app.db.migrations import run_migrations
+from app.db.database import engine, Base
 from app.api.v1.router import api_router
 from app.core.bootstrap import router as bootstrap_router
 
@@ -20,18 +19,8 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     
-    # Run database migrations first (add missing columns to existing tables)
-    logger.info("Running database migrations...")
-    db = SessionLocal()
-    try:
-        run_migrations(db)
-    except Exception as e:
-        logger.error(f"Migration failed: {e}")
-        raise
-    finally:
-        db.close()
-    
-    # Create database tables (for new tables only)
+    # Create database tables (use Alembic for migrations instead of manual migration system)
+    # Run `alembic upgrade head` to apply database migrations
     logger.info("Creating database tables...")
     Base.metadata.create_all(bind=engine)
     
