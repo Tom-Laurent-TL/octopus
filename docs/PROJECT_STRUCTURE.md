@@ -68,10 +68,9 @@ octopus/
 │   └── db/                       # Database tests (mirrors app/db)
 │       └── test_models.py        # Model tests
 │
-├── scripts/                       # Helper scripts
-│   ├── README.md                 # Scripts documentation
-│   ├── test-api.ps1              # PowerShell API test script
-│   └── test-conversations.ps1    # PowerShell conversation test script
+├── examples/                      # API usage examples
+│   ├── README.md                 # curl command examples & documentation
+│   └── demo.py                   # End-to-end demo script (Python)
 │
 ├── docs/                          # Documentation
 ├── .env                          # Environment variables

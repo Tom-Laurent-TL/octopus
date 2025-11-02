@@ -50,24 +50,34 @@ Navigate to:
 
 On first run, create your master API key by calling the bootstrap endpoint (in `app/core/bootstrap.py`):
 
-**Windows PowerShell:**
-```powershell
-# Use the provided script
-.\scripts\bootstrap.ps1
-
-# Or manually:
-Invoke-RestMethod -Uri "http://localhost:8000/bootstrap" -Method Post
-```
-
 **Linux/Mac/WSL:**
 ```bash
 curl -X POST http://localhost:8000/bootstrap
+```
+
+**Windows PowerShell:**
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/bootstrap" -Method Post
 ```
 
 This will return your master API key. **Save it securely** - add it to your `.env` file:
 ```env
 MASTER_API_KEY=octopus_xyz...your-key-here
 ```
+
+### 🎬 Try the Interactive Demo
+
+Want to see all features in action? Run the end-to-end demo:
+
+```bash
+# All platforms
+python examples/demo.py
+
+# Or with uv
+uv run python examples/demo.py
+```
+
+The demo creates users, conversations, messages, and demonstrates the complete API workflow.
 
 ### Run Tests
 
@@ -154,15 +164,27 @@ API uses header-based authentication with the `Octopus-API-Key` header:
 curl -H "Octopus-API-Key: your-secret-api-key" http://localhost:8000/api/v1/users/
 ```
 
+**Linux/Mac/WSL:**
+```bash
+# Set your API key
+export API_KEY="your-secret-api-key"
+
+# Make a request
+curl -H "Octopus-API-Key: $API_KEY" http://localhost:8000/api/v1/users/
+```
+
 **Windows PowerShell:**
 ```powershell
-Invoke-WebRequest -Uri "http://localhost:8000/api/v1/users/" -Headers @{"Octopus-API-Key"="your-secret-api-key"}
+# Set your API key
+$env:API_KEY = "your-secret-api-key"
 
-# Or use the included test script
-.\scripts\test-api.ps1
+# Make a request
+curl.exe -H "Octopus-API-Key: $env:API_KEY" http://localhost:8000/api/v1/users/
 ```
 
 **Or use the interactive API docs at** http://localhost:8000/docs
+
+**For more examples**, see the [`examples/`](examples/) folder with curl commands for all endpoints.
 
 #### Managing API Keys
 
