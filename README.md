@@ -119,8 +119,6 @@ app/
 
 ## 🔑 Features
 
-### Production Features
-
 - **API Key Management** (`/api/v1/api-keys/`)
   - Multiple API keys with custom scopes (read, write, admin)
   - **Rate limiting** - Protection against brute force attacks
@@ -140,16 +138,8 @@ app/
 - **Conversations** (`/api/v1/conversations/`)
   - Create and manage chat conversations
   - Message history with role-based storage
+  - Multi-user participation support
   - Cascade deletion support
-
-### Demo Features
-
-The following features are included as examples from the FastAPI tutorial:
-
-- **Items** (`/api/v1/items/`) - Simple CRUD example
-- **Admin** (`/api/v1/admin/`) - Protected endpoint example
-
-> **Note:** Demo features can be removed or replaced with your own features. Study `conversations/` and `users/` for complete implementation patterns.
 
 ### Authentication
 
@@ -214,7 +204,7 @@ See [API Key Security Documentation](docs/API_KEY_SECURITY.md) for detailed secu
 
 ## 🧪 Testing
 
-- **82 tests** covering all features (all passing)
+- **77 tests** covering all features (all passing)
 - **Service layer tests**: Business logic validation
 - **Router tests**: HTTP endpoint behavior
 - **Database tests**: Model relationships and constraints

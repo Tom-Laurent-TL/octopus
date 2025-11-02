@@ -412,6 +412,45 @@ dependencies=[Depends(verify_api_key)]
 - **Protected**: CRUD operations, user data, admin functions
 - **Never expose sensitive data** in public endpoints (use separate schemas)
 
+**Simple Protected Endpoint Example:**
+```python
+from fastapi import APIRouter, Depends
+from app.core.security import verify_api_key
+
+router = APIRouter(prefix="/items", tags=["items"])
+
+# Protected endpoint - requires authentication
+@router.get("/", dependencies=[Depends(verify_api_key)])
+def list_items():
+    """Simple CRUD list operation."""
+    return {"items": ["item1", "item2", "item3"]}
+
+@router.get("/{item_id}", dependencies=[Depends(verify_api_key)])
+def get_item(item_id: int):
+    """Simple CRUD read operation."""
+    return {"id": item_id, "name": f"Item {item_id}"}
+```
+
+**Router-Level Protection:**
+```python
+# Protect ALL routes in the router
+router = APIRouter(
+    prefix="/admin",
+    tags=["admin"],
+    dependencies=[Depends(verify_api_key)]  # Applied to all routes
+)
+
+@router.post("/")  # Automatically protected
+def admin_operation():
+    return {"message": "Admin operation completed"}
+```
+
+**Key Lessons:**
+- Use `dependencies=[Depends(verify_api_key)]` for protection
+- Apply at router level for consistent protection across all endpoints
+- Apply at endpoint level for fine-grained control
+- Never mix authentication logic into business logic
+
 ---
 
 ## Password Hashing
@@ -521,18 +560,18 @@ app/
 │   ├── database.py
 │   └── models.py
 └── features/          # Feature modules
+    ├── api_keys/
+    │   ├── router.py
+    │   ├── service.py
+    │   └── schemas.py
     ├── conversations/
     │   ├── router.py
     │   ├── service.py
     │   └── schemas.py
-    ├── users/
-    │   ├── router.py
-    │   ├── service.py
-    │   └── schemas.py
-    ├── items/         # Demo code from FastAPI tutorial
-    │   └── router.py
-    └── admin/         # Demo code from FastAPI tutorial
-        └── router.py
+    └── users/
+        ├── router.py
+        ├── service.py
+        └── schemas.py
 ```
 
 **Benefits:**
@@ -542,12 +581,83 @@ app/
 - Better for team collaboration (less merge conflicts)
 - Scales to large projects
 
-**Note:** The `items/` and `admin/` features are placeholder code from the FastAPI tutorial. They serve as examples but can be removed or replaced with your own features.
+### ✅ Best Practice: When to Use Simple vs Complex Feature Structure
+
+**Simple Feature (router only):**
+Use when you have:
+- Static data or simple responses
+- No database operations
+- Minimal business logic
+- Simple CRUD operations with no complex validation
+
+```python
+# features/health/router.py - Simple feature
+from fastapi import APIRouter
+
+router = APIRouter(prefix="/health", tags=["health"])
+
+@router.get("/")
+def health_check():
+    """Simple health check - no service layer needed."""
+    return {"status": "healthy", "version": "1.0.0"}
+```
+
+**Complex Feature (router + service + schemas):**
+Use when you have:
+- Database operations
+- Business logic and validation
+- Complex data transformations
+- Reusable operations across multiple endpoints
+
+```python
+# features/users/router.py - Complex feature
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from app.db.database import get_db
+from . import service, schemas
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+@router.post("/", response_model=schemas.User)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    """Complex operation - delegates to service layer."""
+    return service.create_user(db, user)
+```
+
+**Rule of Thumb:**
+- If it touches the database → Use service layer
+- If it has business logic → Use service layer  
+- If it's just returning static data → Router only is fine
+- If it's used by multiple endpoints → Definitely use service layer
+
+**Migration Path:**
+Start simple, refactor when needed:
+1. Start with router only for simple features
+2. Add service layer when you need database access
+3. Add schemas when you need validation/serialization
+4. Don't over-engineer from the start!
+
+**Pattern for new features:**
+Each feature should follow this structure:
+- `router.py` - HTTP endpoints and request/response handling
+- `service.py` - Business logic and database operations (when needed)
+- `schemas.py` - Pydantic models for validation and serialization (when needed)
+- Better for team collaboration (less merge conflicts)
+- Scales to large projects
+
+**Pattern for new features:**
+Each feature should follow this structure:
+- `router.py` - HTTP endpoints and request/response handling
+- `service.py` - Business logic and database operations
+- `schemas.py` - Pydantic models for validation and serialization
 
 **Mirror in tests:**
 ```
 tests/
 └── features/
+    ├── api_keys/
+    │   ├── test_router.py
+    │   └── test_service.py
     ├── conversations/
     │   ├── test_router.py
     │   └── test_service.py
@@ -570,9 +680,9 @@ tests/
 **The Problem:**
 ```
 tests/
-├── test_items.py       # Which feature is this?
+├── test_database.py    # Which feature does this test?
 ├── test_endpoints.py   # Tests for everything?
-└── test_database.py    # Integration or unit?
+└── test_models.py      # Integration or unit?
 ```
 
 ### ✅ Best Practice: Mirror App Structure

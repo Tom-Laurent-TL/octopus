@@ -48,12 +48,6 @@ octopus/
 │       │   ├── router.py         # API endpoints
 │       │   ├── schemas.py        # Pydantic schemas
 │       │   └── service.py        # Business logic layer
-│       ├── items/                 # Demo/example feature (FastAPI tutorial)
-│       │   ├── __init__.py
-│       │   └── router.py         # Simple CRUD example
-│       └── admin/                 # Demo/example feature (FastAPI tutorial)
-│           ├── __init__.py
-│           └── router.py         # Protected endpoint example
 │
 ├── tests/                         # Test suite
 │   ├── __init__.py
@@ -233,27 +227,6 @@ User management with authentication.
 - Email/username uniqueness validation
 - Public vs protected endpoints
 - Relationship with conversations
-
-### Demo Features
-
-The following features are included as examples from the FastAPI tutorial and can be removed or replaced:
-
-#### Items (`app/features/items/`)
-Simple CRUD operations example from FastAPI documentation.
-
-**Endpoints:**
-- `GET /api/v1/items/` - List items
-- `GET /api/v1/items/{id}` - Get item
-
-**Note:** This is placeholder/demo code - consider removing or replacing with your own feature.
-
-#### Admin (`app/features/admin/`)
-Protected endpoint example showing authentication dependency.
-
-**Endpoints:**
-- `POST /api/v1/admin/` - Admin operations
-
-**Note:** This is placeholder/demo code from FastAPI tutorial - replace with actual admin functionality if needed.
 
 ## Authentication
 
