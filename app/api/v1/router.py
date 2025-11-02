@@ -4,6 +4,7 @@ from app.features.conversations.router import router as conversations_router
 from app.features.items.router import router as items_router
 from app.features.users.router import router as users_router
 from app.features.admin.router import router as admin_router
+from app.features.api_keys.router import router as api_keys_router
 from app.core.security import verify_api_key
 
 api_router = APIRouter()
@@ -12,6 +13,7 @@ api_router = APIRouter()
 api_router.include_router(conversations_router)
 api_router.include_router(items_router)
 api_router.include_router(users_router)
+api_router.include_router(api_keys_router)
 api_router.include_router(
     admin_router, 
     prefix="/admin", 

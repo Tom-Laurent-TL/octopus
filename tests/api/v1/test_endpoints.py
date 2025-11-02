@@ -33,7 +33,7 @@ def test_api_key_authentication_fails(client: TestClient):
 
 def test_api_key_authentication_invalid(client: TestClient):
     """Test that requests with invalid API key fail."""
-    response = client.get("/api/v1/items/", headers={"X-API-Key": "invalid-key"})
+    response = client.get("/api/v1/items/", headers={"Octopus-API-Key": "invalid-key"})
     assert response.status_code == 403
 
 

@@ -23,7 +23,8 @@ octopus/
 │   ├── core/                      # Core functionality
 │   │   ├── __init__.py
 │   │   ├── config.py             # Configuration and settings
-│   │   └── security.py           # Authentication and security
+│   │   ├── security.py           # Authentication and security
+│   │   └── bootstrap.py          # System initialization endpoint
 │   │
 │   ├── db/                        # Database layer
 │   │   ├── __init__.py
@@ -32,6 +33,11 @@ octopus/
 │   │
 │   └── features/                  # Feature modules (domain-driven)
 │       ├── __init__.py
+│       ├── api_keys/              # API key management feature
+│       │   ├── __init__.py
+│       │   ├── router.py         # API endpoints
+│       │   ├── schemas.py        # Pydantic schemas
+│       │   └── service.py        # Business logic layer
 │       ├── conversations/         # Chat conversations feature
 │       │   ├── __init__.py
 │       │   ├── router.py         # API endpoints
@@ -99,6 +105,7 @@ octopus/
 - Cross-cutting concerns
 - Configuration management (Pydantic settings)
 - Security and authentication
+- System initialization (bootstrap endpoint)
 
 #### Database Layer (`app/db/`)
 - SQLAlchemy models
@@ -143,6 +150,49 @@ Each feature has two types of tests:
 - **test_service.py**: Business logic and database operations
 
 ## Current Features
+
+### API Key Management (`app/features/api_keys/`)
+Database-backed multi-key system with scope-based access control and enterprise-grade security features.
+
+**Endpoints:**
+- `POST /bootstrap` - Create initial master API key (one-time, in `app/core/bootstrap.py`)
+- `POST /api/v1/api-keys/` - Create new API key (requires admin scope)
+- `GET /api/v1/api-keys/` - List all API keys (requires admin scope)
+- `GET /api/v1/api-keys/{key_id}` - Get specific API key details
+- `PATCH /api/v1/api-keys/{key_id}` - Update API key (requires admin scope)
+- `POST /api/v1/api-keys/{key_id}/deactivate` - Deactivate API key
+- `DELETE /api/v1/api-keys/{key_id}` - Delete API key (requires admin scope)
+- `POST /api/v1/api-keys/{key_id}/rotate` - Rotate API key (new feature)
+- `GET /api/v1/api-keys/{key_id}/audit-logs` - Get audit trail for a key
+- `GET /api/v1/api-keys/expiring` - List keys expiring soon
+- `POST /api/v1/api-keys/cleanup-expired` - Remove expired keys
+
+**Features:**
+- Scope-based access control (read, write, admin)
+- Optional expiration dates with automated cleanup
+- Usage tracking (last_used_at, last_used_ip)
+- Soft delete (is_active flag)
+- Secure key generation (cryptographically random)
+- Safety checks (can't delete/rotate key you're using)
+- Master key in .env for bootstrapping
+
+**Security Features (Production-Ready):**
+- **Rate Limiting**: 
+  - Global: 100 requests/minute
+  - Authentication: 10 requests/minute
+  - Key creation: 5 requests/minute
+- **Audit Logging**: Complete database trail of all operations
+  - Tracks: action, performer, IP address, timestamp, details
+  - Accessible via API endpoints
+- **Monitoring**: Structured logging for security events
+  - WARNING level for failed authentication
+  - INFO level for successful operations
+  - Includes IP addresses and failure reasons
+- **IP Whitelisting**: Restrict keys to specific IPs (IPv4/IPv6)
+- **Key Rotation**: Automated workflow for secure key replacement
+- **Expiration Management**: Automatic detection and cleanup
+
+See [API Key Security](API_KEY_SECURITY.md) for detailed security documentation.
 
 ### Conversations (`app/features/conversations/`)
 Manages chat conversations with message history and multi-user participation.
@@ -211,8 +261,8 @@ The application uses header-based API key authentication:
 
 **Linux/Mac/WSL (curl):**
 ```bash
-# Protected endpoints require X-API-Key header
-curl -H "X-API-Key: your-secret-api-key" http://localhost:8000/api/v1/users/
+# Protected endpoints require Octopus-API-Key header
+curl -H "Octopus-API-Key: your-secret-api-key" http://localhost:8000/api/v1/users/
 
 # Public endpoints don't require authentication
 curl http://localhost:8000/api/v1/users/username/john
@@ -221,7 +271,7 @@ curl http://localhost:8000/api/v1/users/username/john
 **Windows PowerShell:**
 ```powershell
 # Protected endpoints
-Invoke-WebRequest -Uri "http://localhost:8000/api/v1/users/" -Headers @{"X-API-Key"="your-secret-api-key"} -Method Get
+Invoke-WebRequest -Uri "http://localhost:8000/api/v1/users/" -Headers @{"Octopus-API-Key"="your-secret-api-key"} -Method Get
 
 # Public endpoints
 Invoke-WebRequest -Uri "http://localhost:8000/api/v1/users/username/john" -Method Get
@@ -235,6 +285,16 @@ API_KEY=your-secret-api-key-here
 ## Database
 
 ### Models
+
+**APIKey**
+- id, key_hash, name, description, scopes, is_active, expires_at, created_at, last_used_at
+- **New fields**: last_used_ip (VARCHAR 45), allowed_ips (TEXT, comma-separated)
+- Relationships: audit_logs (one-to-many)
+
+**APIKeyAuditLog** (New Model)
+- id, api_key_id (FK), action, performed_by, ip_address, details, timestamp
+- Relationships: api_key (many-to-one)
+- Tracks: create, update, rotate, deactivate, delete, auth_success, auth_failure
 
 **User**
 - id, email, username, hashed_password, full_name, is_active, is_superuser
@@ -252,6 +312,7 @@ API_KEY=your-secret-api-key-here
 - conversation_participants: Links users to conversations (many-to-many)
 
 ### Relationships
+- APIKey → APIKeyAuditLog (one-to-many) - Tracks all operations on a key
 - User ↔ Conversations (many-to-many via conversation_participants)
 - Conversation → Messages (one-to-many with cascade delete)
 - Message → User (many-to-one, optional - tracks who sent the message)

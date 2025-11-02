@@ -25,7 +25,7 @@ function Test-Endpoint {
     }
     
     if ($RequiresAuth) {
-        $params.Headers = @{"X-API-Key" = $ApiKey}
+        $params.Headers = @{"Octopus-API-Key" = $ApiKey}
     }
     
     if ($Body) {

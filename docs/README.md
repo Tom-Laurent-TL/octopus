@@ -1,6 +1,6 @@
 # Documentation
 
-Welcome to the FastAPI App documentation! This folder contains comprehensive guides for developing and maintaining this application.
+Welcome to the Octopus API documentation! This folder contains comprehensive guides for developing and maintaining this application.
 
 ## 📚 Documentation Index
 
@@ -28,6 +28,31 @@ Welcome to the FastAPI App documentation! This folder contains comprehensive gui
    - Current features documentation
    - Database schema and relationships
 
+### For API Key Management & Security
+
+4. **[API Key Management](API_KEY_MANAGEMENT.md)** 🔑
+   - Complete API key workflow guide
+   - Creating and managing API keys
+   - Scopes and permissions
+   - Key lifecycle management
+   - Usage examples and best practices
+
+5. **[API Key Security](API_KEY_SECURITY.md)** 🔒
+   - Comprehensive security implementation guide
+   - Rate limiting configuration
+   - Audit logging and monitoring
+   - IP whitelisting setup
+   - Key rotation procedures
+   - Incident response procedures
+   - **Read this for production deployments**
+
+6. **[Security Implementation Summary](SECURITY_IMPLEMENTATION.md)** 📋
+   - Overview of all security features implemented
+   - Files modified and changes made
+   - Database schema updates
+   - New endpoints and capabilities
+   - Production readiness checklist
+
 ## 🎯 Quick Navigation
 
 ### I want to...
@@ -37,12 +62,22 @@ Welcome to the FastAPI App documentation! This folder contains comprehensive gui
 - **Avoid common mistakes** → [Best Practices](BEST_PRACTICES.md)
 - **Write tests** → See testing sections in [Feature Implementation Guide](FEATURE_IMPLEMENTATION_GUIDE.md)
 - **Debug an issue** → Check debugging section in [Best Practices](BEST_PRACTICES.md)
+- **Manage API keys** → [API Key Management](API_KEY_MANAGEMENT.md)
+- **Secure the application** → [API Key Security](API_KEY_SECURITY.md)
+- **Deploy to production** → [API Key Security](API_KEY_SECURITY.md) + [Security Implementation](SECURITY_IMPLEMENTATION.md)
 
 ## 📖 Reading Order for New Developers
 
 1. **[Project Architecture](PROJECT_STRUCTURE.md)** - Understand how the project is organized
 2. **[Best Practices](BEST_PRACTICES.md)** - Learn from past mistakes
 3. **[Feature Implementation Guide](FEATURE_IMPLEMENTATION_GUIDE.md)** - Build your first feature
+4. **[API Key Management](API_KEY_MANAGEMENT.md)** - Learn the authentication system
+
+## 📖 Reading Order for Production Deployment
+
+1. **[API Key Security](API_KEY_SECURITY.md)** - Understand all security features
+2. **[Security Implementation Summary](SECURITY_IMPLEMENTATION.md)** - Review what's been implemented
+3. **[API Key Management](API_KEY_MANAGEMENT.md)** - Operational procedures
 
 ## 🔑 Key Concepts
 
@@ -138,8 +173,21 @@ When adding documentation:
 - **Review**: Before major releases
 - **Keep current**: Documentation should match codebase
 
+## 🔒 Security Features
+
+This application includes production-ready security features:
+
+- **Rate Limiting**: Multi-level protection (global, authentication, operations)
+- **Audit Logging**: Complete database-backed audit trail
+- **Monitoring**: Structured logging for security events
+- **IP Whitelisting**: Restrict API keys to specific IP addresses
+- **Key Rotation**: Automated workflow for rotating API keys
+- **Expiration Management**: Automatic cleanup of expired keys
+
+See [API Key Security](API_KEY_SECURITY.md) for detailed implementation.
+
 ---
 
-**Last Updated**: November 1, 2025
+**Last Updated**: November 2, 2025
 
 **Questions?** Check the relevant guide or reach out to the team.

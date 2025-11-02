@@ -10,6 +10,7 @@ dependencies = [
     "pydantic-ai>=1.9.1",
     "pydantic-settings>=2.11.0",
     "sqlalchemy>=2.0.44",
+    "slowapi>=0.1.9",
 ]
 
 [project.optional-dependencies]

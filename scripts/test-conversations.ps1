@@ -1,7 +1,7 @@
 # Test script for many-to-many conversations
 $baseUrl = "http://localhost:8000/api/v1"
 $apiKey = "your-secret-api-key-here"
-$headers = @{ "X-API-Key" = $apiKey }
+$headers = @{ "Octopus-API-Key" = $apiKey }
 
 Write-Host "`n=== Testing Many-to-Many Conversations ===" -ForegroundColor Cyan
 

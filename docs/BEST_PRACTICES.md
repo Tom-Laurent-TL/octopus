@@ -354,8 +354,8 @@ async def get_token_header(token: str = Header(...)):
 **The Solution:**
 ```python
 # ✅ Single, simple API key authentication
-def verify_api_key(x_api_key: str = Header(...)):
-    if x_api_key != settings.api_key:
+def verify_api_key(octopus_api_key: str = Header(...)):
+    if octopus_api_key != settings.master_api_key:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid API key"
@@ -369,7 +369,7 @@ def verify_api_key(x_api_key: str = Header(...)):
 **Phase 1: API Key (Start here)**
 ```python
 # Simple header-based authentication
-X-API-Key: your-secret-key
+Octopus-API-Key: your-secret-key
 
 # In code
 dependencies=[Depends(verify_api_key)]
@@ -642,12 +642,12 @@ def test_list_users(client: TestClient, auth_headers: dict):
 @pytest.fixture
 def auth_headers(settings):
     """Provide valid authentication headers."""
-    return {"X-API-Key": settings.api_key}
+    return {"Octopus-API-Key": settings.master_api_key}
 
 @pytest.fixture
 def invalid_auth_headers():
     """Provide invalid authentication headers."""
-    return {"X-API-Key": "invalid-key"}
+    return {"Octopus-API-Key": "invalid-key"}
 ```
 
 ### ❌ Mistake: Not Isolating Test Database
@@ -1086,13 +1086,13 @@ uv run isort app/ tests/
 **Testing API (Linux/Mac/WSL):**
 ```bash
 # Using curl
-curl -H "X-API-Key: your-secret-api-key" http://localhost:8000/api/v1/users/
+curl -H "Octopus-API-Key: your-secret-api-key" http://localhost:8000/api/v1/users/
 ```
 
 **Testing API (Windows PowerShell):**
 ```powershell
 # Using Invoke-WebRequest
-Invoke-WebRequest -Uri "http://localhost:8000/api/v1/users/" -Headers @{"X-API-Key"="your-secret-api-key"}
+Invoke-WebRequest -Uri "http://localhost:8000/api/v1/users/" -Headers @{"Octopus-API-Key"="your-secret-api-key"}
 
 # Or just use the interactive docs
 # Navigate to http://localhost:8000/docs

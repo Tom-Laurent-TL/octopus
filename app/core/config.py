@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
-    api_key: str = "default-api-key"
+    master_api_key: str = "default-api-key"
     database_url: str = "sqlite:///./chat_conversations.db"
     
     model_config = SettingsConfigDict(
