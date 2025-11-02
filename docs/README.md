@@ -53,6 +53,16 @@ Welcome to the Octopus API documentation! This folder contains comprehensive gui
    - New endpoints and capabilities
    - Production readiness checklist
 
+### For Deployment
+
+7. **[Docker Deployment Guide](DOCKER_DEPLOYMENT.md)** 🐳
+   - Complete Docker setup and deployment
+   - Docker Compose configuration
+   - Database management and migrations
+   - Production deployment strategies
+   - Troubleshooting guide
+   - **Essential for containerized deployments**
+
 ## 🎯 Quick Navigation
 
 ### I want to...
@@ -65,6 +75,8 @@ Welcome to the Octopus API documentation! This folder contains comprehensive gui
 - **Manage API keys** → [API Key Management](API_KEY_MANAGEMENT.md)
 - **Secure the application** → [API Key Security](API_KEY_SECURITY.md)
 - **Deploy to production** → [API Key Security](API_KEY_SECURITY.md) + [Security Implementation](SECURITY_IMPLEMENTATION.md)
+- **Deploy with Docker** → [Docker Deployment Guide](DOCKER_DEPLOYMENT.md)
+- **Fix database issues** → [Docker Deployment Guide](DOCKER_DEPLOYMENT.md#troubleshooting)
 
 ## 📖 Reading Order for New Developers
 

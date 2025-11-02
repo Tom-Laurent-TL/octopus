@@ -29,6 +29,8 @@ MASTER_API_KEY=your-secret-api-key-here
 DATABASE_URL=sqlite:///./chat_conversations.db
 ```
 
+**Note for Docker users**: Keep this configuration! Docker Compose automatically overrides `DATABASE_URL` with the correct Docker path. See [Docker Deployment Guide](docs/DOCKER_DEPLOYMENT.md) for details.
+
 ### Run the Application
 
 ```bash
@@ -257,15 +259,159 @@ octopus/
 └── pyproject.toml        # Dependencies
 ```
 
-## 🚢 Docker Support
+## 🚢 Docker Deployment
+
+### Quick Start
+
+**1. Build and Start Container:**
 
 ```bash
-# Build the Docker image
+# Using Docker Compose (Recommended)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+```
+
+**2. Bootstrap (First Time Only):**
+
+```bash
+# Create your master API key
+curl -X POST http://localhost:8000/bootstrap
+
+# Or on Windows PowerShell:
+Invoke-RestMethod -Uri "http://localhost:8000/bootstrap" -Method Post
+```
+
+**3. Save Your API Key:**
+
+Update your `.env` file with the returned API key:
+
+```env
+MASTER_API_KEY=octopus_abc123...your-actual-key
+# Local development database path
+DATABASE_URL=sqlite:///./chat_conversations.db
+# Docker database path (uncomment when running in Docker)
+# DATABASE_URL=sqlite:////app/data/chat_conversations.db
+```
+
+> **Note**: You can keep the local `DATABASE_URL` - Docker Compose automatically overrides it with the correct path. Or uncomment the Docker line if you prefer explicit configuration.
+
+**4. Restart to Apply:**
+
+```bash
+docker-compose restart
+```
+
+**5. Access the API:**
+
+- **API Docs**: http://localhost:8000/docs
+- **API**: http://localhost:8000
+- **Health**: http://localhost:8000/health
+
+### Docker Features
+
+✅ **Automatic Database Migrations** - Schema updates on startup  
+✅ **Persistent Storage** - Database saved in `./data/` directory  
+✅ **Environment Override** - `.env` works for both local and Docker  
+✅ **Health Checks** - Built-in container health monitoring  
+✅ **Volume Mount** - Easy backup and restore  
+
+### Using Docker Directly
+
+```bash
+# Build the image
 docker build -t octopus .
 
-# Run the container
-docker run -p 8000:80 octopus
+# Run with persistent volume
+docker run -d -p 8000:80 -v $(pwd)/data:/app/data --name octopus-api octopus
+
+# Windows PowerShell:
+docker run -d -p 8000:80 -v ${PWD}/data:/app/data --name octopus-api octopus
 ```
+
+### Database Management
+
+**Backup Database:**
+```bash
+# Docker Compose
+cp ./data/chat_conversations.db ./backup_$(date +%Y%m%d).db
+
+# Windows PowerShell
+Copy-Item .\data\chat_conversations.db .\backup_$(Get-Date -Format 'yyyyMMdd').db
+```
+
+**Reset Database:**
+```bash
+# Stop container
+docker-compose down
+
+# Delete database
+rm -rf ./data/chat_conversations.db
+
+# Start fresh
+docker-compose up -d
+curl -X POST http://localhost:8000/bootstrap
+```
+
+**Automatic Migrations:**
+
+The application automatically runs database migrations on startup to ensure schema compatibility. If you update the code:
+
+```bash
+# Just rebuild and restart - migrations run automatically
+docker-compose up -d --build
+```
+
+### Environment Configuration
+
+Your `.env` file works for **both** local development and Docker:
+
+```env
+MASTER_API_KEY=your-master-key-here
+# Local development database path
+DATABASE_URL=sqlite:///./chat_conversations.db
+# Docker database path (uncomment when running in Docker)
+# DATABASE_URL=sqlite:////app/data/chat_conversations.db
+```
+
+**Two Options:**
+
+1. **Keep local path (Recommended)** - Docker Compose automatically overrides `DATABASE_URL` with the correct Docker path. No manual changes needed!
+
+2. **Uncomment Docker path** - If running exclusively in Docker, uncomment the Docker `DATABASE_URL` line and comment out the local one.
+
+| Environment | Database Path | Configured By |
+|-------------|---------------|---------------|
+| Local (`uv run`) | `./chat_conversations.db` | `.env` file |
+| Docker Compose | `./data/chat_conversations.db` | `docker-compose.yml` |
+
+### Troubleshooting
+
+**Database Schema Errors:**
+```bash
+# Migrations run automatically on startup
+docker-compose restart
+```
+
+**Port Already in Use:**
+```bash
+# Change port in docker-compose.yml
+ports:
+  - "8001:80"  # Use 8001 instead of 8000
+```
+
+**View Container Logs:**
+```bash
+docker-compose logs -f
+```
+
+**Check Container Status:**
+```bash
+docker-compose ps
+```
+
+📚 **Complete Docker guide with production deployment**: [Docker Deployment Guide](docs/DOCKER_DEPLOYMENT.md)
 
 ## 🤝 Contributing
 

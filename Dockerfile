@@ -10,5 +10,11 @@ COPY . /app
 WORKDIR /app
 RUN uv sync --locked --no-cache
 
+# Create a volume for the database
+VOLUME ["/app/data"]
+
+# Set environment variable to use the volume for database
+ENV DATABASE_URL=sqlite:////app/data/chat_conversations.db
+
 # Run the application.
 CMD ["/app/.venv/bin/fastapi", "run", "app/main.py", "--port", "80"]
