@@ -237,7 +237,7 @@ def show_structure(
         
         if not project_root:
             console.print("[red]❌ Error: Not in an Octopus project (no pyproject.toml found).[/red]")
-            console.print("[yellow]   Run 'octopus create app' to create a new project first.[/yellow]")
+            console.print("[yellow]   Run 'octopus init' to create a new project first.[/yellow]")
             console.print("[yellow]   Or specify a path with --path[/yellow]")
             raise typer.Exit(code=1)
         

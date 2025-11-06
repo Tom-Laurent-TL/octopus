@@ -66,6 +66,35 @@ octopus add feature settings
 octopus add feature products/inventory
 octopus add feature users/profile/avatar
 
+# Visualize your structure
+octopus structure --routes
+```
+
+**Beautiful visualization:**
+```
+📍 Found project at: C:\Users\tesla\Git\test_app
+
+╭──────────────────────── Project Structure ────────────────────────╮
+│                                                                   │
+│  🐙 test_app/                                                     │
+│  └── 🏠 app/                                                      │
+│      ├── ⚡ users/ (2 routes)                                     │
+│      │   ├── GET /                                                │
+│      │   ├── POST /                                               │
+│      │   └── ⚡ profile/ (2 routes)                               │
+│      │       ├── GET /                                            │
+│      │       └── PUT /                                            │
+│      ├── ⚡ products/ (1 route)                                   │
+│      │   └── GET /                                                 │
+│      ├── 📦 database/                                             │
+│      └── 📦 auth/                                                 │
+│                                                                    │
+╰────────────────────────────────────────────────────────────────────╯
+📊 Statistics: 3 features • 2 shared modules • 5 routers • 7 services
+```
+
+**Run it:**
+```bash
 # Run it
 uv run fastapi dev
 ```

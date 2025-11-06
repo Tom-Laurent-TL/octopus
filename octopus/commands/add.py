@@ -52,7 +52,7 @@ def add_feature(
     
     if not project_root:
         typer.echo("❌ Error: Not in an Octopus project (no pyproject.toml found).", err=True)
-        typer.echo("   Run 'octopus create app' to create a new project first.", err=True)
+        typer.echo("   Run 'octopus init' to create a new project first.", err=True)
         raise typer.Exit(code=1)
     
     if not app_root:
@@ -224,7 +224,7 @@ def add_shared(
     
     if not project_root:
         typer.echo("❌ Error: Not in an Octopus project (no pyproject.toml found).", err=True)
-        typer.echo("   Run 'octopus create app' to create a new project first.", err=True)
+        typer.echo("   Run 'octopus init' to create a new project first.", err=True)
         raise typer.Exit(code=1)
     
     if not app_root:
