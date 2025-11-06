@@ -63,7 +63,7 @@ def add_feature(
     # Detect context - find or create features/ directory
     features_dir = None
     
-    # Handle nested feature paths (e.g., "conversations/messages")
+    # Handle nested feature paths (e.g., "users/profile/avatar")
     # Nested paths ALWAYS start from app/features/ (absolute from root)
     if '/' in name or '\\' in name:
         name = name.replace('\\', '/')
@@ -74,31 +74,45 @@ def add_feature(
             typer.echo(f"❌ Error: app/features/ directory does not exist.", err=True)
             raise typer.Exit(code=1)
         
-        # Validate that parent feature exists
-        potential_parent = app_root / "features" / parts[0]
+        # Validate ALL parent features exist and are valid units
+        current_path = app_root / "features"
+        parent_chain = []
         
-        # Check if parent exists
-        if not potential_parent.exists():
-            typer.echo(f"❌ Error: Parent feature '{parts[0]}' does not exist.", err=True)
-            typer.echo(f"   Expected at: {potential_parent}", err=True)
-            typer.echo(f"   Create it first with: octopus add feature {parts[0]}", err=True)
-            raise typer.Exit(code=1)
+        # Validate each parent in the path (all except the last part which is the new feature)
+        for i, parent_name in enumerate(parts[:-1]):
+            parent_path = current_path / parent_name
+            parent_chain.append(parent_name)
+            
+            # Check if parent exists
+            if not parent_path.exists():
+                typer.echo(f"❌ Error: Parent feature '{'/'.join(parent_chain)}' does not exist.", err=True)
+                typer.echo(f"   Expected at: {parent_path}", err=True)
+                typer.echo(f"   Create it first with: octopus add feature {'/'.join(parent_chain)}", err=True)
+                raise typer.Exit(code=1)
+            
+            # Check if parent is a valid feature unit (has router.py)
+            if not (parent_path / "router.py").exists():
+                typer.echo(f"❌ Error: '{'/'.join(parent_chain)}' exists but is not a valid feature unit.", err=True)
+                typer.echo(f"   Missing router.py at: {parent_path}", err=True)
+                typer.echo(f"   Only feature units can contain nested features.", err=True)
+                raise typer.Exit(code=1)
+            
+            # Move to the next level - this parent's features/ subdirectory
+            current_path = parent_path / "features"
         
-        # Check if parent is a valid feature (has router.py)
-        if not (potential_parent / "router.py").exists():
-            typer.echo(f"❌ Error: '{parts[0]}' exists but is not a feature (no router.py found).", err=True)
-            typer.echo(f"   Path: {potential_parent}", err=True)
-            raise typer.Exit(code=1)
-        
-        # Parent is valid - use its features/ subdirectory
-        features_dir = potential_parent / "features"
+        # All parents are valid - use the final parent's features/ subdirectory
+        features_dir = current_path
         features_dir.mkdir(exist_ok=True)
         if not (features_dir / "__init__.py").exists():
             create_file(features_dir / "__init__.py", "")
-        typer.echo(f"📁 Creating nested feature in: {parts[0]}/features/")
         
-        # Update name to be just the remaining path
-        name = '/'.join(parts[1:])
+        if len(parts) > 2:
+            typer.echo(f"📁 Creating nested feature in: {'/'.join(parts[:-1])}/features/")
+        else:
+            typer.echo(f"📁 Creating nested feature in: {parts[0]}/features/")
+        
+        # Update name to be just the final part (the actual feature name)
+        name = parts[-1]
     
     # If not handled by nested path logic, use normal context detection
     if features_dir is None:
