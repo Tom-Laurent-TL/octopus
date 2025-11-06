@@ -249,7 +249,7 @@ def add_shared(
     # Detect context - find or create shared/ directory
     shared_dir = None
     
-    # Handle nested shared paths (e.g., "conversations/database")
+    # Handle nested shared paths (e.g., "users/profile/helpers")
     # Nested paths ALWAYS start from app/features/ (absolute from root)
     if '/' in name or '\\' in name:
         name = name.replace('\\', '/')
@@ -260,31 +260,52 @@ def add_shared(
             typer.echo(f"❌ Error: app/features/ directory does not exist.", err=True)
             raise typer.Exit(code=1)
         
-        # Validate that parent feature exists
-        potential_parent = app_root / "features" / parts[0]
+        # Validate ALL parent features exist and are valid units
+        current_path = app_root / "features"
+        parent_chain = []
         
-        # Check if parent exists
-        if not potential_parent.exists():
-            typer.echo(f"❌ Error: Parent feature '{parts[0]}' does not exist.", err=True)
-            typer.echo(f"   Expected at: {potential_parent}", err=True)
-            typer.echo(f"   Create it first with: octopus add feature {parts[0]}", err=True)
-            raise typer.Exit(code=1)
+        # Validate each parent in the path (all except the last part which is the new shared module)
+        for i, parent_name in enumerate(parts[:-1]):
+            parent_path = current_path / parent_name
+            parent_chain.append(parent_name)
+            
+            # Check if parent exists
+            if not parent_path.exists():
+                typer.echo(f"❌ Error: Parent feature '{'/'.join(parent_chain)}' does not exist.", err=True)
+                typer.echo(f"   Expected at: {parent_path}", err=True)
+                typer.echo(f"   Create it first with: octopus add feature {'/'.join(parent_chain)}", err=True)
+                raise typer.Exit(code=1)
+            
+            # Check if parent is a valid feature unit (has router.py)
+            if not (parent_path / "router.py").exists():
+                typer.echo(f"❌ Error: '{'/'.join(parent_chain)}' exists but is not a valid feature unit.", err=True)
+                typer.echo(f"   Missing router.py at: {parent_path}", err=True)
+                typer.echo(f"   Only feature units can contain shared modules.", err=True)
+                raise typer.Exit(code=1)
+            
+            # Move to the next level - this parent's features/ subdirectory
+            current_path = parent_path / "features"
         
-        # Check if parent is a valid feature (has router.py)
-        if not (potential_parent / "router.py").exists():
-            typer.echo(f"❌ Error: '{parts[0]}' exists but is not a feature (no router.py found).", err=True)
-            typer.echo(f"   Path: {potential_parent}", err=True)
-            raise typer.Exit(code=1)
+        # All parents are valid - use the final parent's shared/ subdirectory
+        final_parent = app_root / "features"
+        for parent_name in parts[:-1]:
+            final_parent = final_parent / parent_name / "features"
         
-        # Parent is valid - use its shared/ subdirectory
-        shared_dir = potential_parent / "shared"
+        # Go back one level to get the actual parent (not its features dir)
+        final_parent = final_parent.parent
+        
+        shared_dir = final_parent / "shared"
         shared_dir.mkdir(exist_ok=True)
         if not (shared_dir / "__init__.py").exists():
             create_file(shared_dir / "__init__.py", "")
-        typer.echo(f"📁 Creating nested shared module in: {parts[0]}/shared/")
         
-        # Update name to be just the remaining path
-        name = '/'.join(parts[1:])
+        if len(parts) > 2:
+            typer.echo(f"📁 Creating nested shared module in: {'/'.join(parts[:-1])}/shared/")
+        else:
+            typer.echo(f"📁 Creating nested shared module in: {parts[0]}/shared/")
+        
+        # Update name to be just the final part (the actual shared module name)
+        name = parts[-1]
     
     # If not handled by nested path logic, use normal context detection
     if shared_dir is None:
