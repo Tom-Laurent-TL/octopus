@@ -1,33 +1,21 @@
 [project]
 name = "octopus"
 version = "0.1.0"
-description = "Add your description here"
+description = "A FastAPI-oriented architecture generator for building modular, layered applications"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastapi[standard]>=0.120.4",
-    "bcrypt>=5.0.0",
-    "pydantic-ai>=1.9.1",
-    "pydantic-settings>=2.11.0",
-    "sqlalchemy>=2.0.44",
-    "slowapi>=0.1.9",
-    "alembic>=1.17.1",
+    "fastapi>=0.121.0",
+    "pydantic>=2.12.4",
+    "typer>=0.20.0",
 ]
 
-[project.optional-dependencies]
-test = [
-    "pytest>=8.4.2",
-    "pytest-cov>=7.0.0",
-    "httpx>=0.28.1",
-]
+[project.scripts]
+octopus = "octopus.cli:app"
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = [
-    "-v",
-    "--strict-markers",
-    "--tb=short",
+[tool.uv.workspace]
+members = [
+    "test_app",
+    "testing",
+    "hello/wold",
 ]

@@ -1,463 +1,335 @@
-# Octopus
+# 🐙 Octopus CLI
 
-A production-ready FastAPI application with feature-based architecture, comprehensive testing, and clean separation of concerns.
+> A powerful FastAPI project generator with recursive fractal onion architecture
 
-## 🚀 Quick Start
+## 📖 Overview
+
+Octopus is a production-ready CLI tool that generates well-structured FastAPI applications following a **recursive fractal onion architecture**. Every component (app, feature, shared module) can contain nested features and shared modules, creating a self-similar structure at any depth.
+
+### Key Features
+
+✨ **Recursive Architecture** - Features can contain sub-features infinitely deep  
+🧅 **Onion Layer Pattern** - Clear separation: Router → Service → Entities/Schemas  
+🔄 **Auto-Discovery** - Routers automatically mount without manual configuration  
+📦 **Context-Aware** - Commands detect where you are in the project structure  
+🎯 **Service Layer Pattern** - Business logic isolated from routing and data layers  
+🌊 **Cascading Shared Modules** - App-level utilities available at any depth  
+📚 **Comprehensive Docs** - Every app includes architecture guides and examples  
+🔧 **UV Package Manager** - Modern Python dependency management  
+⚡ **Tab Completion** - Shell autocompletion support for all commands
+
+## 🚀 Installation
 
 ### Prerequisites
-- Python 3.13+
-- [uv](https://github.com/astral-sh/uv) package manager
 
-### Installation
+- Python 3.10+ (tested with 3.13)
+- [UV package manager](https://github.com/astral-sh/uv) installed
+
+### Install from Source
 
 ```bash
 # Clone the repository
-git clone https://github.com/Tom-Laurent-TL/octopus.git
-cd octopus
+git clone <repository-url>
+cd cli_project
 
-# Install dependencies
-uv sync
-uv sync --extra test
+# Create virtual environment and install
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\Activate.ps1
+
+# Install in editable mode
+uv pip install -e .
 ```
 
-### Configuration
+After installation, the `octopus` command is available in your terminal (with virtual environment activated).
 
-Create a `.env` file in the project root:
+### Shell Autocompletion (Optional)
 
-```env
-MASTER_API_KEY=your-secret-api-key-here
-DATABASE_URL=sqlite:///./data/chat_conversations.db
+Enable tab completion for your shell:
+
+**PowerShell:**
+```powershell
+octopus --install-completion powershell
+# Restart your terminal
 ```
 
-**Note**: Database is stored in the `data/` folder for clean organization and consistency with Docker setup. See [Docker Deployment Guide](docs/DOCKER_DEPLOYMENT.md) for details.
+**Bash:**
+```bash
+octopus --install-completion bash
+# Then run: source ~/.bashrc
+```
 
-### Run the Application
+**Zsh:**
+```zsh
+octopus --install-completion zsh
+# Then run: source ~/.zshrc
+```
+
+**Fish:**
+```fish
+octopus --install-completion fish
+# Restart your terminal
+```
+
+After installation, you can press TAB to autocomplete commands, subcommands, and options!
+
+## 📋 Available Commands
+
+### Create Application
 
 ```bash
-# Development server with auto-reload
+# Create a new FastAPI application with full architecture
+octopus create app <NAME>
+
+# Example
+octopus create app my-api
+```
+
+Creates a complete FastAPI project with:
+- Main app with config as a shared module
+- Comprehensive documentation (ARCHITECTURE.md, BEST_PRACTICES.md, EXAMPLES.md)
+- UV package management setup
+- Ready-to-run FastAPI application
+
+### Add Feature
+
+```bash
+# Add a feature module (context-aware)
+octopus add feature <NAME>
+
+# Examples
+octopus add feature users           # In app root - creates app/users/
+octopus add feature hello_world     # Inside features/users/ - creates nested feature
+```
+
+Creates:
+- Router with automatic mounting
+- Service class for business logic
+- `entities.py` for database models
+- `schemas.py` for API models
+- Auto-imports for sibling shared modules (commented)
+- On-demand `features/` and `shared/` subdirectories
+
+### Add Shared Module
+
+```bash
+# Add a shared module (context-aware)
+octopus add shared <NAME>
+
+# Examples
+octopus add shared database         # Creates shared/database/
+octopus add shared auth            # Creates shared/auth/
+```
+
+Creates:
+- Service class pattern
+- Automatically updates all sibling features with import comments
+- Special handling for `config` module (includes Settings class)
+
+### 🚧 Coming Soon
+
+```bash
+# Generate test stubs (placeholder)
+octopus stub tests
+
+# Generate documentation stubs (placeholder)
+octopus stub docs
+
+# Display project structure tree (placeholder)
+octopus structure
+```
+
+## 🎯 Quick Start Example
+
+```bash
+# 1. Create a new application
+octopus create app my-api
+cd my-api
+
+# 2. Run the app (it works immediately!)
 uv run fastapi dev app/main.py
 
-# Production server
-uv run fastapi run app/main.py
+# 3. Add a users feature
+octopus add feature users
+
+# 4. Navigate into users and add a nested feature
+cd app/users
+octopus add feature profile
+
+# 5. Add shared modules
+cd ../..  # Back to app root
+octopus add shared database
+octopus add shared auth
+
+# 6. Add shared module to nested feature
+cd app/users
+octopus add shared validation
+
+# Routes are automatically mounted:
+# GET /users/         -> app/users/router.py
+# GET /users/profile/ -> app/users/features/profile/router.py
 ```
 
-Navigate to:
-- **API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
+## 🏗️ Generated Project Structure
 
-### Bootstrap (First Time Setup)
-
-On first run, create your master API key by calling the bootstrap endpoint (in `app/core/bootstrap.py`):
-
-**Linux/Mac/WSL:**
-```bash
-curl -X POST http://localhost:8000/bootstrap
+```
+my-api/
+├── app/
+│   ├── __init__.py          # Auto-discovery: mounts all features & shared
+│   ├── main.py              # FastAPI app entry point
+│   ├── router.py            # Root API router
+│   ├── users/               # Feature (created with: octopus add feature users)
+│   │   ├── __init__.py      # Auto-mounts sub-features & shared modules
+│   │   ├── router.py        # Routes: /users/*
+│   │   ├── service.py       # Business logic (UsersService class)
+│   │   ├── entities.py      # Database models (SQLAlchemy)
+│   │   ├── schemas.py       # API models (Pydantic)
+│   │   ├── features/        # Nested features (created on-demand)
+│   │   │   └── profile/     # Sub-feature: /users/profile/*
+│   │   │       ├── router.py
+│   │   │       ├── service.py
+│   │   │       └── ...
+│   │   └── shared/          # Feature-scoped shared modules
+│   │       └── validation/  # Shared within users feature
+│   └── shared/              # App-level shared modules
+│       ├── config/          # Configuration (created by default)
+│       │   ├── __init__.py
+│       │   └── service.py   # Settings class + ConfigService
+│       ├── database/        # (created with: octopus add shared database)
+│       │   ├── __init__.py
+│       │   └── service.py   # DatabaseService class
+│       └── auth/            # (created with: octopus add shared auth)
+│           ├── __init__.py
+│           └── service.py   # AuthService class
+├── docs/
+│   ├── ARCHITECTURE.md      # Complete architecture guide
+│   ├── BEST_PRACTICES.md    # Coding standards & patterns
+│   └── EXAMPLES.md          # Real-world implementation examples
+├── pyproject.toml           # UV package configuration
+└── uv.lock                  # Locked dependencies
 ```
 
-**Windows PowerShell:**
-```powershell
-Invoke-RestMethod -Uri "http://localhost:8000/bootstrap" -Method Post
+### Key Architecture Principles
+
+🔁 **Recursive Structure** - Every unit (app, feature) can contain:
+- `features/` - Nested features (self-similar structure)
+- `shared/` - Shared modules for that scope
+- Standard files: `router.py`, `service.py`, `entities.py`, `schemas.py`
+
+🧅 **Onion Layers** (dependency direction: →)
+```
+Router → Service → Entities/Schemas
 ```
 
-This will return your master API key. **Save it securely** - add it to your `.env` file:
-```env
-MASTER_API_KEY=octopus_xyz...your-key-here
+🚀 **Auto-Discovery** - No manual imports needed:
+- `app/__init__.py` auto-mounts all features
+- Feature `__init__.py` auto-mounts sub-features
+- Uses centralized `auto_discover_routers()` utility
+
+🌊 **Cascading Shared Modules** - The killer feature:
+```python
+app/shared/config/     # Automatically available to ALL features
+app/shared/database/   # At ANY nesting depth
+
+# Even deeply nested features have access (absolute imports):
+# app/features/users/features/profile/features/avatar/__init__.py
+# from app.shared.config.service import settings    ✅ Works!
+# from app.shared.database.service import get_db    ✅ Works!
+
+# No more unreadable relative imports like:
+# from ......shared.config import settings  ❌ Avoid this!
 ```
 
-### 🎬 Try the Interactive Demo
-
-Want to see all features in action? Run the end-to-end demo:
-
-```bash
-# All platforms
-python examples/demo.py
-
-# Or with uv
-uv run python examples/demo.py
+📦 **Service Layer Pattern** - All business logic in `XxxService` classes:
+```python
+class UsersService:
+    def get_all(self): ...
+    def create(self, data): ...
 ```
 
-The demo creates users, conversations, messages, and demonstrates the complete API workflow.
+## 🛠️ Technology Stack
 
-### Run Tests
+### CLI
+- **Typer** - CLI framework with Rich styling
+- **Python 3.10+** - Modern Python features
 
-```bash
-# Run all tests
-uv run pytest -v
+### Generated Applications
+- **FastAPI** - High-performance async web framework
+- **Pydantic** - Data validation and settings management
+- **Pydantic-Settings** - Environment-based configuration
+- **UV** - Fast Python package manager
+- **SQLAlchemy** - ORM (in documentation examples)
+- **Python-Jose** - JWT tokens (in auth examples)
+- **Bcrypt** - Password hashing (in auth examples)
 
-# Run with coverage
-uv run pytest --cov=app --cov-report=html
+## ✅ What's Implemented
 
-# Run specific feature tests
-uv run pytest tests/features/users/ -v
-```
+- ✅ **Full app scaffolding** with recursive structure
+- ✅ **Feature generation** with Service class pattern
+- ✅ **Shared module generation** with auto-imports
+- ✅ **Context-aware commands** (detects current location)
+- ✅ **Auto-discovery system** (no manual router mounting)
+- ✅ **Comprehensive documentation** (3 markdown guides per app)
+- ✅ **UV package management** integration
+- ✅ **Shell autocompletion** support
+- ✅ **On-demand directory creation** (no empty folders)
+- ✅ **Relative imports** (works at any nesting depth)
+
+## 🔮 Roadmap
+
+- [ ] **Test stub generation** - Auto-generate test files for features
+- [ ] **Documentation stubs** - Generate API documentation from code
+- [ ] **Structure visualization** - Display project tree
+- [ ] **Migration tools** - Convert existing projects to Octopus structure
+- [ ] **Plugin system** - Custom generators and templates
+- [ ] **Interactive mode** - Guided project creation
+- [ ] **Template customization** - User-defined code templates
+- [ ] **CI/CD templates** - GitHub Actions, GitLab CI workflows
 
 ## 📚 Documentation
 
-Comprehensive documentation is available in the [`docs/`](docs/) folder:
+Every generated app includes comprehensive documentation in the `docs/` folder:
 
-- **[Feature Implementation Guide](docs/FEATURE_IMPLEMENTATION_GUIDE.md)** - Step-by-step guide for building new features
-- **[Best Practices](docs/BEST_PRACTICES.md)** - Real-world lessons learned and common pitfalls to avoid
-- **[Project Architecture](docs/PROJECT_STRUCTURE.md)** - Architecture overview, directory structure, and current features
+- **ARCHITECTURE.md** - Complete architecture explanation, fractal structure, auto-discovery, nesting guidelines
+- **BEST_PRACTICES.md** - Service patterns, dependency injection, error handling, security, testing
+- **EXAMPLES.md** - Full CRUD example, nested features, JWT authentication, database setup
 
-👉 **New to the project?** Start with the [Documentation Index](docs/README.md)
+## 🎓 Learning Resources
 
-## 🏗️ Architecture
-
-This application follows a **feature-based architecture** with clear layer separation:
-
-```
-app/
-├── core/              # Configuration, security, and system initialization
-│   ├── config.py      # Application settings
-│   ├── security.py    # Authentication verification
-│   └── bootstrap.py   # System initialization endpoint
-├── db/                # Database models and setup
-├── features/          # Feature modules
-│   ├── api_keys/      # API key management feature
-│   ├── conversations/ # Chat conversation feature
-│   └── users/         # User management feature
-└── api/v1/            # API version routing
-```
-
-### Key Principles
-
-- **Feature-based structure**: Each feature is self-contained
-- **Service layer pattern**: Business logic separated from HTTP concerns
-- **Comprehensive testing**: Both unit and integration tests
-- **Type safety**: Full type hints with Pydantic validation
-
-## 🔑 Features
-
-- **API Key Management** (`/api/v1/api-keys/`)
-  - Multiple API keys with custom scopes (read, write, admin)
-  - **Rate limiting** - Protection against brute force attacks
-  - **Audit logging** - Complete trail of all key operations
-  - **Key rotation** - Built-in rotation support
-  - **IP whitelisting** - Restrict keys to specific IPs
-  - **Expiration management** - Automatic cleanup of expired keys
-  - **Monitoring** - Structured logging for security events
-  - Usage tracking (last used timestamp and IP)
-  - See [API Key Security](docs/API_KEY_SECURITY.md) for details
-
-- **User Management** (`/api/v1/users/`)
-  - User registration and authentication
-  - Password hashing with bcrypt
-  - Public and protected endpoints
-  
-- **Conversations** (`/api/v1/conversations/`)
-  - Create and manage chat conversations
-  - Message history with role-based storage
-  - Multi-user participation support
-  - Cascade deletion support
-
-### Authentication
-
-The application uses a database-backed API key system with scopes for fine-grained access control.
-
-#### Using API Keys
-
-API uses header-based authentication with the `Octopus-API-Key` header:
-
-**Linux/Mac/WSL:**
-```bash
-curl -H "Octopus-API-Key: your-secret-api-key" http://localhost:8000/api/v1/users/
-```
-
-**Linux/Mac/WSL:**
-```bash
-# Set your API key
-export API_KEY="your-secret-api-key"
-
-# Make a request
-curl -H "Octopus-API-Key: $API_KEY" http://localhost:8000/api/v1/users/
-```
-
-**Windows PowerShell:**
-```powershell
-# Set your API key
-$env:API_KEY = "your-secret-api-key"
-
-# Make a request
-curl.exe -H "Octopus-API-Key: $env:API_KEY" http://localhost:8000/api/v1/users/
-```
-
-**Or use the interactive API docs at** http://localhost:8000/docs
-
-**For more examples**, see the [`examples/`](examples/) folder with curl commands for all endpoints.
-
-#### Managing API Keys
-
-Once you have your master API key, you can create additional keys with specific scopes:
+After creating an app with `octopus create app my-api`, read the generated docs:
 
 ```bash
-# Create a new API key with read-only access
-curl -X POST "http://localhost:8000/api/v1/api-keys/" \
-  -H "Octopus-API-Key: your-master-key" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Read-Only Key", "scopes": "read", "description": "For monitoring tools"}'
-
-# List all API keys
-curl -H "Octopus-API-Key: your-master-key" http://localhost:8000/api/v1/api-keys/
-
-# Deactivate an API key
-curl -X POST "http://localhost:8000/api/v1/api-keys/2/deactivate" \
-  -H "Octopus-API-Key: your-master-key"
+cd my-api
+cat docs/ARCHITECTURE.md      # Understand the structure
+cat docs/BEST_PRACTICES.md    # Learn coding patterns
+cat docs/EXAMPLES.md          # See real implementations
 ```
 
-**Available Scopes:**
-- `read` - Read-only access to resources
-- `write` - Create and update resources
-- `admin` - Full access including API key management
-
-**Security Features:**
-- Keys are only shown once upon creation
-- Track last usage timestamp and IP address for each key
-- Set optional expiration dates with automated cleanup
-- Deactivate keys without deletion (audit trail)
-- Cannot deactivate or delete the key you're currently using
-- **Rate limiting** on all endpoints (protection against brute force)
-- **Audit logging** for all key operations (complete trail)
-- **IP whitelisting** for sensitive keys (restrict by IP address)
-- **Key rotation** support (automated workflow)
-- **Monitoring** with structured logging (security events)
-
-See [API Key Security Documentation](docs/API_KEY_SECURITY.md) for detailed security features.
-
-## 🗄️ Database Migrations
-
-This project uses **[Alembic](https://alembic.sqlalchemy.org/)** for database schema migrations.
+## 🙋 Getting Help
 
 ```bash
-# Apply all pending migrations
-uv run alembic upgrade head
+# General help
+octopus --help
 
-# Check current migration version
-uv run alembic current
-
-# Create a new migration after model changes
-uv run alembic revision --autogenerate -m "description"
-
-# Rollback one migration
-uv run alembic downgrade -1
+# Command-specific help
+octopus create --help
+octopus add --help
+octopus add feature --help
+octopus add shared --help
 ```
-
-**First time setup** (if you already have a database):
-```bash
-# Mark existing database as at current baseline
-uv run alembic stamp head
-```
-
-For comprehensive migration guides, see [Database Migrations Documentation](docs/DATABASE_MIGRATIONS.md).
-
-## 🧪 Testing
-
-- **77 tests** covering all features (all passing)
-- **Service layer tests**: Business logic validation
-- **Router tests**: HTTP endpoint behavior
-- **Database tests**: Model relationships and constraints
-- **API Key tests**: Authentication, authorization, and security features
-- **Security tests**: Rate limiting, audit logging, IP whitelisting
-
-```bash
-# Run all tests
-uv run pytest -v
-
-# Run with coverage report
-uv run pytest --cov=app --cov-report=html
-# Open htmlcov/index.html
-```
-
-## 🛠️ Tech Stack
-
-- **FastAPI** - Modern web framework
-- **Pydantic** - Data validation
-- **SQLAlchemy** - ORM and database
-- **Bcrypt** - Password hashing
-- **slowapi** - Rate limiting
-- **Pytest** - Testing framework
-- **SQLite** - Database (easily swappable)
-
-## 📦 Project Structure
-
-```
-octopus/
-├── app/
-│   ├── api/v1/           # API routing
-│   ├── core/             # Config and security
-│   ├── db/               # Database models
-│   └── features/         # Feature modules
-│       ├── conversations/
-│       └── users/
-├── tests/                # Test suite
-│   ├── api/
-│   ├── db/
-│   └── features/
-├── docs/                 # Documentation
-└── pyproject.toml        # Dependencies
-```
-
-## 🚢 Docker Deployment
-
-### Quick Start
-
-**1. Build and Start Container:**
-
-```bash
-# Using Docker Compose (Recommended)
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-```
-
-**2. Bootstrap (First Time Only):**
-
-```bash
-# Create your master API key
-curl -X POST http://localhost:8000/bootstrap
-
-# Or on Windows PowerShell:
-Invoke-RestMethod -Uri "http://localhost:8000/bootstrap" -Method Post
-```
-
-**3. Save Your API Key:**
-
-Update your `.env` file with the returned API key:
-
-```env
-MASTER_API_KEY=octopus_abc123...your-actual-key
-# Local development database path
-DATABASE_URL=sqlite:///./chat_conversations.db
-# Docker database path (uncomment when running in Docker)
-# DATABASE_URL=sqlite:////app/data/chat_conversations.db
-```
-
-> **Note**: You can keep the local `DATABASE_URL` - Docker Compose automatically overrides it with the correct path. Or uncomment the Docker line if you prefer explicit configuration.
-
-**4. Restart to Apply:**
-
-```bash
-docker-compose restart
-```
-
-**5. Access the API:**
-
-- **API Docs**: http://localhost:8000/docs
-- **API**: http://localhost:8000
-- **Health**: http://localhost:8000/health
-
-### Docker Features
-
-✅ **Automatic Database Migrations** - Schema updates on startup  
-✅ **Persistent Storage** - Database saved in `./data/` directory  
-✅ **Environment Override** - `.env` works for both local and Docker  
-✅ **Health Checks** - Built-in container health monitoring  
-✅ **Volume Mount** - Easy backup and restore  
-
-### Using Docker Directly
-
-```bash
-# Build the image
-docker build -t octopus .
-
-# Run with persistent volume
-docker run -d -p 8000:80 -v $(pwd)/data:/app/data --name octopus-api octopus
-
-# Windows PowerShell:
-docker run -d -p 8000:80 -v ${PWD}/data:/app/data --name octopus-api octopus
-```
-
-### Database Management
-
-**Backup Database:**
-```bash
-# Docker Compose
-cp ./data/chat_conversations.db ./backup_$(date +%Y%m%d).db
-
-# Windows PowerShell
-Copy-Item .\data\chat_conversations.db .\backup_$(Get-Date -Format 'yyyyMMdd').db
-```
-
-**Reset Database:**
-```bash
-# Stop container
-docker-compose down
-
-# Delete database
-rm -rf ./data/chat_conversations.db
-
-# Start fresh
-docker-compose up -d
-curl -X POST http://localhost:8000/bootstrap
-```
-
-**Automatic Migrations:**
-
-The application automatically runs database migrations on startup to ensure schema compatibility. If you update the code:
-
-```bash
-# Just rebuild and restart - migrations run automatically
-docker-compose up -d --build
-```
-
-### Environment Configuration
-
-Your `.env` file works for **both** local development and Docker:
-
-```env
-MASTER_API_KEY=your-master-key-here
-# Local development database path
-DATABASE_URL=sqlite:///./chat_conversations.db
-# Docker database path (uncomment when running in Docker)
-# DATABASE_URL=sqlite:////app/data/chat_conversations.db
-```
-
-**Two Options:**
-
-1. **Keep local path (Recommended)** - Docker Compose automatically overrides `DATABASE_URL` with the correct Docker path. No manual changes needed!
-
-2. **Uncomment Docker path** - If running exclusively in Docker, uncomment the Docker `DATABASE_URL` line and comment out the local one.
-
-| Environment | Database Path | Configured By |
-|-------------|---------------|---------------|
-| Local (`uv run`) | `./data/chat_conversations.db` | `.env` file |
-| Docker Compose | `./data/chat_conversations.db` | `docker-compose.yml` |
-
-### Troubleshooting
-
-**Database Schema Errors:**
-```bash
-# Migrations run automatically on startup
-docker-compose restart
-```
-
-**Port Already in Use:**
-```bash
-# Change port in docker-compose.yml
-ports:
-  - "8001:80"  # Use 8001 instead of 8000
-```
-
-**View Container Logs:**
-```bash
-docker-compose logs -f
-```
-
-**Check Container Status:**
-```bash
-docker-compose ps
-```
-
-📚 **Complete Docker guide with production deployment**: [Docker Deployment Guide](docs/DOCKER_DEPLOYMENT.md)
 
 ## 🤝 Contributing
 
-1. Read the [Feature Implementation Guide](docs/FEATURE_IMPLEMENTATION_GUIDE.md)
-2. Follow the [Best Practices](docs/BEST_PRACTICES.md)
-3. Write tests for all new features
-4. Ensure all tests pass before submitting
+Contributions are welcome! Areas for contribution:
+- Implement remaining commands (stub tests, stub docs, structure)
+- Add more documentation examples
+- Create custom templates
+- Improve error handling
+- Add tests for the CLI itself
 
-## 📝 License
+## 📄 License
 
-See [LICENSE](LICENSE) file for details.
+MIT License - See LICENSE file for details
+
+---
+
+**Built with ❤️ for FastAPI developers**
