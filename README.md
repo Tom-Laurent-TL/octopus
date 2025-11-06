@@ -74,18 +74,24 @@ octopus structure
 ```
 🐙 test_app/
 └── 🏠 app/
-    ├── ⚡ users/ (2 routes)
-    │   ├── GET /
-    │   ├── POST /
-    │   └── ⚡ profile/ (2 routes)
-    │       ├── GET /
-    │       └── PUT /
+    ├── ⚡ inventory/ (1 route)
+    │   └── GET /status
     ├── ⚡ products/ (1 route)
-    │   └── GET /
+    │   ├── GET /status
+    │   └── ⚡ inventory/ (1 route)
+    │       └── GET /status
+    ├── ⚡ users/ (1 route)
+    │   ├── GET /status
+    │   └── ⚡ profile/ (1 route)
+    │       ├── GET /status
+    │       └── ⚡ avatar/ (1 route)
+    │           └── GET /status
+    ├── 📦 auth/
+    ├── 📦 config/
     ├── 📦 database/
-    └── 📦 auth/
+    └── 📦 routing/
 
-📊 Statistics: 3 features • 2 shared modules • 5 routers • 7 services
+📊 Statistics: 6 features • 4 shared modules • 6 routers • 10 services
 ```
 
 **Run it:**
