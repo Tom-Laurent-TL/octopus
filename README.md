@@ -16,13 +16,15 @@
 
 ## ⚡ Why Octopus?
 
+**Traditional FastAPI project setup:**
 ```bash
-# Traditional FastAPI project setup
 mkdir my-api && cd my-api
 touch main.py requirements.txt
 # ... 30 minutes of boilerplate later ...
+```
 
-# With Octopus
+**With Octopus:**
+```bash
 octopus init
 # ✨ Production-ready FastAPI app in 2 seconds
 ```
@@ -35,14 +37,15 @@ octopus init
 ♾️ **Infinite Nesting** - Features inside features, as deep as you need  
 🧅 **Onion Architecture** - Clean layers: Router → Service → Entities/Schemas  
 🔄 **Auto-Discovery** - Add a feature, it's instantly available in your API  
-📦 **Modern Stack** - FastAPI + UV + Pydantic + Your choice of DB/Auth
+�️ **Path Syntax** - Create nested features from anywhere: `octopus add feature users/profile`  
+�📦 **Modern Stack** - FastAPI + UV + Pydantic + Your choice of DB/Auth
 
 ## 🎬 See It In Action
 
 ```bash
 # Create your app
 octopus init
-cd my-api
+cd app
 
 # Add features - they auto-mount to your API
 octopus add feature users
@@ -57,8 +60,12 @@ cd app/users
 octopus add feature profile
 octopus add feature settings
 
+# Or use path syntax - no need to navigate!
+octopus add feature products/inventory
+octopus add feature users/profile/avatar
+
 # Run it
-uv run fastapi dev app/main.py
+uv run fastapi dev
 ```
 
 **Result:** Fully working API with routes:
@@ -123,10 +130,15 @@ uv run fastapi dev app/main.py
 octopus add feature users
 octopus add shared database
 
-# Navigate and add nested features
+# Add nested features - two ways:
+# 1. Navigate into the feature
 cd app/users
 octopus add feature authentication
 octopus add feature profile
+
+# 2. Or use path syntax from anywhere
+octopus add feature users/settings
+octopus add feature users/profile/avatar
 
 # View your structure
 octopus structure --routes
@@ -183,6 +195,10 @@ octopus add feature <NAME>
 # Examples
 octopus add feature users           # In app root - creates app/users/
 octopus add feature hello_world     # Inside features/users/ - creates nested feature
+
+# Or use path syntax from anywhere (no need to cd!)
+octopus add feature users/profile   # Creates app/users/features/profile/
+octopus add feature users/profile/settings  # Deeply nested!
 ```
 
 Creates:
