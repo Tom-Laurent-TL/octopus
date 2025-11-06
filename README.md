@@ -26,6 +26,7 @@ touch main.py requirements.txt
 **With Octopus:**
 ```bash
 octopus init
+uv run fastapi dev
 # ✨ Production-ready FastAPI app in 2 seconds
 ```
 
