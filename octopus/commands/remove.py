@@ -5,7 +5,7 @@ import typer
 from pathlib import Path
 import shutil
 
-from octopus_cli.utils import find_project_root
+from octopus.utils import find_project_root
 from rich.console import Console
 
 app = typer.Typer(help="Commands for removing components from your Octopus application")

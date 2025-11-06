@@ -2,8 +2,8 @@
 Generator for shared Octopus units.
 """
 from pathlib import Path
-from octopus_cli.utils import create_file
-from octopus_cli.templates.templates import (
+from octopus.utils import create_file
+from octopus.templates.templates import (
     get_shared_service_template,
     get_shared_entities_template,
     get_shared_schemas_template,

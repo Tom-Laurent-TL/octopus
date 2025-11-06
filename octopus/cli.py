@@ -2,7 +2,7 @@
 Main entry point for the Octopus CLI.
 """
 import typer
-from octopus_cli.commands import add, remove, structure, init
+from octopus.commands import add, remove, structure, init
 
 app = typer.Typer(
     help="🐙 Octopus CLI – modular FastAPI architecture generator",

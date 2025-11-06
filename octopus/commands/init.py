@@ -4,10 +4,10 @@ Command for initializing new Octopus applications.
 import typer
 from pathlib import Path
 
-from octopus_cli.utils import run_command, create_file
-from octopus_cli.generators.unit import create_octopus_unit
-from octopus_cli.generators.shared import create_shared_unit
-from octopus_cli.templates.templates import (
+from octopus.utils import run_command, create_file
+from octopus.generators.unit import create_octopus_unit
+from octopus.generators.shared import create_shared_unit
+from octopus.templates.templates import (
     get_main_template,
     get_env_example_template,
     get_root_readme_template,

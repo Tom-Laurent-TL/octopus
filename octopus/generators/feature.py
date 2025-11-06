@@ -2,8 +2,8 @@
 Generator for Octopus Feature units.
 """
 from pathlib import Path
-from octopus_cli.utils import create_file
-from octopus_cli.templates.templates import (
+from octopus.utils import create_file
+from octopus.templates.templates import (
     get_feature_router_template,
     get_feature_service_template,
     get_feature_entities_template,

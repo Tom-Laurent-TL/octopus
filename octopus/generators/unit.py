@@ -2,8 +2,8 @@
 Generator for Octopus Units.
 """
 from pathlib import Path
-from octopus_cli.utils import create_file
-from octopus_cli.templates.templates import (
+from octopus.utils import create_file
+from octopus.templates.templates import (
     get_root_router_template,
     get_router_template,
     get_service_template,

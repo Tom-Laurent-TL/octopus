@@ -8,7 +8,7 @@ from rich.tree import Tree
 from rich.panel import Panel
 from rich.text import Text
 
-from octopus_cli.utils import find_project_root
+from octopus.utils import find_project_root
 
 app = typer.Typer(help="Commands for viewing project structure")
 console = Console()

@@ -418,12 +418,6 @@ After installation, press TAB to autocomplete commands, subcommands, and options
 
 ## 🔮 Roadmap
 
-- [ ] **Enhanced test generation** - Auto-generate test files for each feature
-- [ ] **API documentation generation** - Generate OpenAPI docs from code
-- [ ] **Migration tools** - Convert existing projects to Octopus structure
-- [ ] **Plugin system** - Custom generators and templates
-- [ ] **Interactive mode** - Guided project creation with prompts
-- [ ] **Template customization** - User-defined code templates
 - [ ] **CI/CD templates** - GitHub Actions, GitLab CI workflows
 - [ ] **Database migration integration** - Alembic setup and templates
 - [ ] **Docker configuration** - Dockerfile and docker-compose templates

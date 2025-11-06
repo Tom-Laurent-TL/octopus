@@ -4,10 +4,10 @@ Commands for adding features and shared modules to an Octopus application.
 import typer
 from pathlib import Path
 
-from octopus_cli.utils import create_file, find_project_root
-from octopus_cli.generators.feature import create_feature_unit, snake_to_pascal
-from octopus_cli.generators.shared import create_shared_unit
-from octopus_cli.templates.templates import get_feature_test_template
+from octopus.utils import create_file, find_project_root
+from octopus.generators.feature import create_feature_unit, snake_to_pascal
+from octopus.generators.shared import create_shared_unit
+from octopus.templates.templates import get_feature_test_template
 
 app = typer.Typer(help="Commands for adding components to your Octopus application")
 
