@@ -8,6 +8,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.121+-green.svg)](https://fastapi.tiangolo.com/)
+[![Typer](https://img.shields.io/badge/Typer-CLI-purple.svg)](https://typer.tiangolo.com/)
 [![UV](https://img.shields.io/badge/UV-package%20manager-orange.svg)](https://github.com/astral-sh/uv)
 
 </div>
@@ -378,7 +379,8 @@ class UsersService:
 <summary><b>🛠️ Technology Stack</b></summary>
 
 ### CLI
-- **Typer** - CLI framework with Rich styling
+- **Typer** - Modern CLI framework with beautiful terminal output and Rich integration
+- **Rich** - Beautiful terminal formatting, colors, and progress indicators
 - **Python 3.10+** - Modern Python features
 
 ### Generated Applications
