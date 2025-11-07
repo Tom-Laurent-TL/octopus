@@ -74,24 +74,22 @@ octopus structure
 ```
 🐙 test_app/
 └── 🏠 app/
-    ├── ⚡ inventory/ (1 route)
-    │   └── GET /status
     ├── ⚡ products/ (1 route)
-    │   ├── GET /status
+    │   ├── GET /status Get status of the products feature.
     │   └── ⚡ inventory/ (1 route)
-    │       └── GET /status
+    │       └── GET /status Get status of the inventory feature.
     ├── ⚡ users/ (1 route)
-    │   ├── GET /status
+    │   ├── GET /status Get status of the users feature.
     │   └── ⚡ profile/ (1 route)
-    │       ├── GET /status
+    │       ├── GET /status Get status of the profile feature.
     │       └── ⚡ avatar/ (1 route)
-    │           └── GET /status
+    │           └── GET /status Get status of the avatar feature.
     ├── 📦 auth/
     ├── 📦 config/
     ├── 📦 database/
     └── 📦 routing/
 
-📊 Statistics: 6 features • 4 shared modules • 6 routers • 10 services
+📊 Statistics: 5 features • 4 shared modules • 5 routers • 9 services
 ```
 
 **Run it:**

@@ -32,20 +32,62 @@ def _is_octopus_unit(path: Path) -> tuple[bool, str]:
 
 
 def _extract_routes(router_path: Path) -> list[str]:
-    """Extract route definitions from a router.py file."""
+    """Extract route definitions from a router.py file with descriptions."""
     routes = []
     try:
         content = router_path.read_text(encoding="utf-8")
         import re
         
-        # Match @router.get("/path"), @router.post("/path"), etc.
-        pattern = r'@router\.(get|post|put|delete|patch)\(["\']([^"\']+)["\']'
-        matches = re.finditer(pattern, content)
+        # Split content into lines for context-aware parsing
+        lines = content.split('\n')
         
-        for match in matches:
-            method = match.group(1).upper()
-            path = match.group(2)
-            routes.append(f"{method} {path}")
+        # Match @router.get("/path"), @router.post("/path"), etc.
+        for i, line in enumerate(lines):
+            route_match = re.search(r'@router\.(get|post|put|delete|patch)\(["\']([^"\']+)["\']', line)
+            if route_match:
+                method = route_match.group(1).upper()
+                path = route_match.group(2)
+                
+                # Look for description in the decorator or function docstring
+                description = None
+                
+                # Check for description parameter in decorator (might span multiple lines)
+                desc_match = re.search(r'description\s*=\s*["\']([^"\']+)["\']', line)
+                if desc_match:
+                    description = desc_match.group(1)
+                else:
+                    # Check next few lines for multi-line decorator
+                    for j in range(i, min(i + 5, len(lines))):
+                        desc_match = re.search(r'description\s*=\s*["\']([^"\']+)["\']', lines[j])
+                        if desc_match:
+                            description = desc_match.group(1)
+                            break
+                
+                # If no description in decorator, check function docstring
+                if not description and i + 1 < len(lines):
+                    # Find the function definition
+                    func_start = i + 1
+                    while func_start < len(lines) and not lines[func_start].strip().startswith('def '):
+                        func_start += 1
+                    
+                    # Check for docstring after function definition
+                    if func_start + 1 < len(lines):
+                        next_line = lines[func_start + 1].strip()
+                        if next_line.startswith('"""') or next_line.startswith("'''"):
+                            # Extract first line of docstring
+                            docstring = next_line.strip('"""').strip("'''").strip()
+                            if docstring:
+                                description = docstring
+                
+                # Format the route with optional description
+                if description:
+                    # Truncate long descriptions
+                    max_desc_length = 50
+                    if len(description) > max_desc_length:
+                        description = description[:max_desc_length - 3] + "..."
+                    routes.append(f"{method} {path} {description}")
+                else:
+                    routes.append(f"{method} {path}")
         
     except Exception:
         pass
@@ -128,7 +170,12 @@ def _build_tree(path: Path, tree: Tree, max_depth: int, current_depth: int = 0, 
                             
                             # Add routes as sub-items
                             for route in routes:
-                                method, path = route.split(" ", 1)
+                                # Split into parts: method, path, and optional description
+                                parts = route.split(" ", 2)  # Split into max 3 parts
+                                method = parts[0]
+                                path = parts[1] if len(parts) > 1 else ""
+                                description = parts[2] if len(parts) > 2 else None
+                                
                                 method_colors = {
                                     "GET": "green",
                                     "POST": "blue",
@@ -137,7 +184,13 @@ def _build_tree(path: Path, tree: Tree, max_depth: int, current_depth: int = 0, 
                                     "PATCH": "magenta"
                                 }
                                 color = method_colors.get(method, "white")
-                                branch.add(f"[{color}]{method}[/{color}] [dim]{path}[/dim]")
+                                
+                                if description:
+                                    # Display: colored method, dimmed path, and dim gray description
+                                    branch.add(f"[{color}]{method}[/{color}] [dim]{path}[/dim] [dim bright_black]{description}[/dim bright_black]")
+                                else:
+                                    # No description - path is dimmed
+                                    branch.add(f"[{color}]{method}[/{color}] [dim]{path}[/dim]")
                         else:
                             branch = tree.add(f"{icon} {item.name}/", style=style)
                         
