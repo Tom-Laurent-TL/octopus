@@ -148,9 +148,8 @@ uv pip install -e .
 ### Create Your First App
 
 ```bash
-mkdir my-api && cd my-api
-octopus init
-uv run fastapi dev app/main.py
+octopus init --path your/path/my-project (will create the path if needed)
+uv run fastapi dev
 ```
 
 🎉 **That's it!** Open http://localhost:8000 - your API is live!
