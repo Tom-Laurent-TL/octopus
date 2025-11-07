@@ -105,9 +105,11 @@ def init_command(
     app_path.mkdir(exist_ok=True)
     
     # Create root app structure
+    typer.echo("📁 Creating root app structure...")
     create_octopus_unit(app_path, is_root=True)
     
     # Create main.py
+    typer.echo("📄 Creating main.py...")
     create_file(app_path / "main.py", get_main_template())
     
     # Create shared/config as a proper shared module
@@ -122,7 +124,42 @@ def init_command(
     create_shared_unit(routing_path, "routing")
     
     # Create .env.example
+    typer.echo("📄 Creating .env.example...")
     create_file(base_path / ".env.example", get_env_example_template())
+
+    # Create .env (copy from .env.example)
+    typer.echo("📄 Creating .env from .env.example...")
+    env_example_path = base_path / ".env.example"
+    env_path = base_path / ".env"
+    if env_example_path.exists():
+        env_content = env_example_path.read_text()
+        create_file(env_path, env_content)
+    else:
+        create_file(env_path, get_env_example_template())
+
+    # Ensure .gitignore has entries for .pytest_cache/ and .env
+    typer.echo("📄 Updating .gitignore...")
+    gitignore_path = base_path / ".gitignore"
+    pytest_cache_comment = "# Pytest cache (test runs)"
+    pytest_cache_line = ".pytest_cache/"
+    env_comment = "# Environment variables"
+    env_line = ".env"
+    gitignore_lines = []
+    if gitignore_path.exists():
+        lines = gitignore_path.read_text().splitlines()
+        add_pytest = pytest_cache_line not in lines
+        add_env = env_line not in lines
+        if add_pytest and add_env:
+            gitignore_lines.append(f"\n{pytest_cache_comment}\n{pytest_cache_line}\n\n{env_comment}\n{env_line}\n")
+        elif add_pytest:
+            gitignore_lines.append(f"\n{pytest_cache_comment}\n{pytest_cache_line}\n")
+        elif add_env:
+            gitignore_lines.append(f"\n{env_comment}\n{env_line}\n")
+        if gitignore_lines:
+            with gitignore_path.open("a", encoding="utf-8") as f:
+                f.write("".join(gitignore_lines))
+    else:
+        create_file(gitignore_path, f"{pytest_cache_comment}\n{pytest_cache_line}\n\n{env_comment}\n{env_line}\n")
     
     # Create tests structure
     typer.echo("📁 Creating tests/ structure...")
