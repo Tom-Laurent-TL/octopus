@@ -39,8 +39,8 @@ uv run pytest
 ♾️ **Infinite Nesting** - Features inside features, as deep as you need  
 🧅 **Onion Architecture** - Clean layers: Router → Service → Entities/Schemas  
 🔄 **Auto-Discovery** - Add a feature, it's instantly available in your API  
-�️ **Path Syntax** - Create nested features from anywhere: `octopus add feature users/profile`  
-�📦 **Modern Stack** - FastAPI + UV + Pydantic + Your choice of DB/Auth
+✨ **Path Syntax** - Create nested features from anywhere: `octopus add feature users/profile`  
+📦 **Modern Stack** - FastAPI + UV + Pydantic + Your choice of DB/Auth
 
 ## 🎬 See It In Action
 
