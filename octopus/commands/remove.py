@@ -4,15 +4,80 @@ Commands for removing features and shared modules from an Octopus application.
 import typer
 from pathlib import Path
 import shutil
+from typing import List, Tuple
 
 from octopus.utils import find_project_root
 from rich.console import Console
+from rich.tree import Tree
 
 app = typer.Typer(help="Commands for removing components from your Octopus application")
 console = Console()
 
 # Context variable to pass flags from parent command to subcommands
 _context = {}
+
+
+def _count_nested_items(path: Path) -> Tuple[int, int]:
+    """
+    Recursively count nested features and shared modules.
+    
+    Args:
+        path: Path to the feature or shared module directory
+        
+    Returns:
+        Tuple of (feature_count, shared_count)
+    """
+    feature_count = 0
+    shared_count = 0
+    
+    # Count nested features
+    features_dir = path / "features"
+    if features_dir.exists():
+        for item in features_dir.iterdir():
+            if item.is_dir() and (item / "router.py").exists():
+                feature_count += 1
+                # Recursively count in this feature
+                nested_features, nested_shared = _count_nested_items(item)
+                feature_count += nested_features
+                shared_count += nested_shared
+    
+    # Count nested shared modules
+    shared_dir = path / "shared"
+    if shared_dir.exists():
+        for item in shared_dir.iterdir():
+            if item.is_dir() and (item / "service.py").exists():
+                shared_count += 1
+    
+    return feature_count, shared_count
+
+
+def _build_nested_tree(path: Path, tree: Tree) -> None:
+    """
+    Build a rich tree showing nested features and shared modules.
+    
+    Args:
+        path: Path to the feature or shared module directory
+        tree: Rich Tree object to add nodes to
+    """
+    # Add nested features
+    features_dir = path / "features"
+    if features_dir.exists():
+        feature_items = [item for item in features_dir.iterdir() 
+                        if item.is_dir() and (item / "router.py").exists()]
+        if feature_items:
+            for item in sorted(feature_items):
+                feature_branch = tree.add(f"⚡ [cyan]{item.name}/[/cyan] (feature)")
+                # Recursively add nested items
+                _build_nested_tree(item, feature_branch)
+    
+    # Add nested shared modules
+    shared_dir = path / "shared"
+    if shared_dir.exists():
+        shared_items = [item for item in shared_dir.iterdir() 
+                       if item.is_dir() and (item / "service.py").exists()]
+        if shared_items:
+            for item in sorted(shared_items):
+                shared_branch = tree.add(f"📦 [green]{item.name}/[/green] (shared)")
 
 
 # Callback for remove command
@@ -127,10 +192,24 @@ def remove_feature(
         typer.echo(f"   Path: {feature_path}", err=True)
         raise typer.Exit(code=1)
     
+    # Count nested items
+    nested_features, nested_shared = _count_nested_items(feature_path)
+    
     # Confirm deletion
     if not force:
-        console.print(f"\n[yellow]⚠️  This will delete:[/yellow]")
-        console.print(f"   📁 {feature_path}")
+        console.print(f"\n[yellow]⚠️  WARNING: This will delete the following:[/yellow]\n")
+        
+        # Build tree showing what will be deleted
+        tree = Tree(f"⚡ [bold cyan]{feature_path.name}/[/bold cyan] (feature)")
+        _build_nested_tree(feature_path, tree)
+        console.print(tree)
+        
+        console.print(f"\n[yellow]📊 Total impact:[/yellow]")
+        console.print(f"   • Main feature directory: [cyan]{feature_path}[/cyan]")
+        if nested_features > 0:
+            console.print(f"   • Nested features: [cyan]{nested_features}[/cyan]")
+        if nested_shared > 0:
+            console.print(f"   • Nested shared modules: [green]{nested_shared}[/green]")
         
         # Check for test and docs directories
         try:
@@ -139,14 +218,14 @@ def remove_feature(
             docs_path = project_root / "docs" / "app" / relative_from_app
             
             if tests_path.exists():
-                console.print(f"   🧪 {tests_path}")
+                console.print(f"   • Tests: [yellow]{tests_path}[/yellow]")
             if docs_path.exists():
-                console.print(f"   📚 {docs_path}")
+                console.print(f"   • Docs: [yellow]{docs_path}[/yellow]")
         except ValueError:
             pass
         
         console.print()
-        if not typer.confirm("❓ Are you sure you want to remove this feature?"):
+        if not typer.confirm("❓ Are you sure you want to remove this feature and all its nested content?"):
             typer.echo("❌ Cancelled.")
             raise typer.Exit(code=0)
     
@@ -288,10 +367,24 @@ def remove_shared(
         typer.echo(f"   Path: {shared_path}", err=True)
         raise typer.Exit(code=1)
     
+    # Count nested items (shared modules can also have nested features/shared)
+    nested_features, nested_shared = _count_nested_items(shared_path)
+    
     # Confirm deletion
     if not force:
-        console.print(f"\n[yellow]⚠️  This will delete:[/yellow]")
-        console.print(f"   📁 {shared_path}")
+        console.print(f"\n[yellow]⚠️  WARNING: This will delete the following:[/yellow]\n")
+        
+        # Build tree showing what will be deleted
+        tree = Tree(f"📦 [bold green]{shared_path.name}/[/bold green] (shared)")
+        _build_nested_tree(shared_path, tree)
+        console.print(tree)
+        
+        console.print(f"\n[yellow]📊 Total impact:[/yellow]")
+        console.print(f"   • Main shared module directory: [green]{shared_path}[/green]")
+        if nested_features > 0:
+            console.print(f"   • Nested features: [cyan]{nested_features}[/cyan]")
+        if nested_shared > 0:
+            console.print(f"   • Nested shared modules: [green]{nested_shared}[/green]")
         
         # Check for test and docs directories
         try:
@@ -300,14 +393,14 @@ def remove_shared(
             docs_path = project_root / "docs" / "app" / relative_from_app
             
             if tests_path.exists():
-                console.print(f"   🧪 {tests_path}")
+                console.print(f"   • Tests: [yellow]{tests_path}[/yellow]")
             if docs_path.exists():
-                console.print(f"   📚 {docs_path}")
+                console.print(f"   • Docs: [yellow]{docs_path}[/yellow]")
         except ValueError:
             pass
         
         console.print()
-        if not typer.confirm("❓ Are you sure you want to remove this shared module?"):
+        if not typer.confirm("❓ Are you sure you want to remove this shared module and all its nested content?"):
             typer.echo("❌ Cancelled.")
             raise typer.Exit(code=0)
     
