@@ -90,6 +90,14 @@ def init_command(
         if not run_command(cmd, cwd=base_path):
             typer.echo(f"⚠️  Warning: Failed to install {name}")
     
+    # Step 4.5: Add Octopus as optional dev dependency
+    typer.echo("⚙️  Adding Octopus CLI as dev dependency...")
+    octopus_cmd = ["uv", "add", "--optional", "dev", "octopus@git+https://github.com/Tom-Laurent-TL/octopus.git"]
+    if not run_command(octopus_cmd, cwd=base_path):
+        typer.echo("⚠️  Warning: Failed to add Octopus as dev dependency")
+    else:
+        typer.echo("   ✅ Added Octopus CLI to dev dependencies")
+    
     # Step 5: Create directory structure
     typer.echo("📁 Creating Octopus structure...")
     

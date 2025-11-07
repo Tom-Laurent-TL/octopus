@@ -7,6 +7,7 @@ from octopus.commands import add, remove, structure, init
 app = typer.Typer(
     help="🐙 Octopus CLI – modular FastAPI architecture generator",
     add_completion=True,  # Enable shell completion
+    no_args_is_help=True,  # Show help when no command is provided
 )
 
 # Register subcommands
